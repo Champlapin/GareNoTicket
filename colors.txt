@@ -1,0 +1,18 @@
+colors: {
+ 'text': '#020817',
+ 'background': '#e2e9fd',
+ 'primary': '#00144d',
+ 'secondary': '#c2d1fa',
+ 'accent': '#1349dd',
+},
+
+
+DarkMode
+
+colors: {
+ 'text': '#e8eefd',
+ 'background': '#02091d',
+ 'primary': '#b3c7ff',
+ 'secondary': '#05143d',
+ 'accent': '#2258ec',
+},
