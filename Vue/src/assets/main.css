@@ -1,35 +1,35 @@
-@import './base.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+@layer base {
+    :root {
+        --color-text: 2, 8, 23;
+        --color-background: 226, 233, 253;
+        --color-primary: 0, 20, 77;
+        --color-secondary: 194, 209, 250;
+        --color-accent: 19, 73, 221;
+    }
 
-  font-weight: normal;
-}
+    :root[data-theme="dark"] {
+        --color-text: 232, 238, 253;
+        --color-background: 2, 9, 29;
+        --color-primary: 179, 199, 255;
+        --color-secondary: 5, 20, 61;
+        --color-accent: 34, 88, 236;
 
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-}
+    }
+    @media (prefers-colors-scheme: dark) {
+        
+        :root{
+                --color-text: 232, 238, 253;
+                --color-background: 2, 9, 29;
+                --color-primary: 179, 199, 255;
+                --color-secondary: 5, 20, 61;
+                --color-accent: 34, 88, 236;
+        
+            }
+        
+    }
 
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
-}
-
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
-
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
 }
