@@ -5,12 +5,15 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
+      fontFamily: {
+        poppins: ['Poppins', 'sans-serif']
+      },
       colors: {
         text: 'rgba(var(--color-text), <alpha-value>)',
         background: 'rgba(var(--color-background), <alpha-value>)',
         primary: 'rgba(var(--color-primary), <alpha-value>)',
         secondary: 'rgba(var(--color-secondary), <alpha-value>)',
-        accent: 'rgba(var(--color-primary), <alpha-value>)',
+        accent: 'rgba(var(--color-accent), <alpha-value>)',
         dark: {
           text: '#e8eefd',
           background: '#02091d',

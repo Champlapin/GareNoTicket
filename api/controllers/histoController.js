@@ -26,7 +26,12 @@ exports.effectuerPaiement = async (req, res, next) => {
 	const userId = req.user.userId;
 	try {
 		//TODO : Coder le paiement.
+		
+
+
 		let a = 0;
+
+
 	} catch (error) {
 		next(error);
 	}

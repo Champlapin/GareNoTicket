@@ -4,6 +4,7 @@ const User = require("../models/user");
 const Voiture = require("../models/voiture");
 const Histo = require("../models/historique");
 const config = require("../config");
+const user = require("../models/user");
 const url_base = config.URL + ":" + config.PORT;
 
 /**
@@ -55,6 +56,19 @@ exports.getUser = async (req, res, next) => {
 	}
 };
 
+exports.getUserBySession = async (req, res, next) => {
+	try {
+		const userId = req.params.id;
+		console.log(userId);
+		const user = await checkUserExists(userId);
+		res.status(200).json({
+			user: user,
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
 exports.getUserById = async (req, res, next) => {
 	try {
 		const userId = req.params.id;
@@ -68,9 +82,44 @@ exports.getUserById = async (req, res, next) => {
 	}
 };
 
-exports.updateUser = async (req, res, next) => {};
+exports.updateUser = async (req, res, next) => {
+	try {
+		let userId = req.params.userId;
+		const { username, email } = req.body;
+		const newValues = { username, email };
 
-exports.updateCar = async (req, res, next) => {};
+		const results = User.findByIdAndUpdate(userId, newValues);
+
+		if (!results) {
+			res.status(400).json({ message: "l'utilisateur n'existe pas" });
+		}
+		res.status(200).json(results);
+	} catch (error) {
+		next(error);
+	}
+};
+
+exports.updateCar = async (req, res, next) => {
+	try {
+		let userId = req.params.userId;
+		const { marque, modele, couleur, immatriculation } = req.body;
+		const newValues = { marque, modele, couleur, immatriculation };
+
+		let user = User.findById(userId);
+		if (!user) {
+			res.status(400).json({ message: "l'utilisateur n'existe pas." });
+		}
+
+		const results = Voiture.findById(user.voiture, newValues);
+		if (!results) {
+			res.status(400).json({ message: "l'utilisateur n'a pas de voiture." });
+		}
+
+		res.status(200).json(results);
+	} catch (error) {
+		next(error);
+	}
+};
 
 exports.deleteUser = async (req, res, next) => {
 	try {

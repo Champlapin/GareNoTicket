@@ -3,9 +3,11 @@
 @tailwind utilities;
 
 @layer base {
+    #map {}
+
     :root {
         --color-text: 2, 8, 23;
-        --color-background: 226, 233, 253;
+        --color-background: 250, 250, 255;
         --color-primary: 0, 20, 77;
         --color-secondary: 194, 209, 250;
         --color-accent: 19, 73, 221;
@@ -19,17 +21,18 @@
         --color-accent: 34, 88, 236;
 
     }
+
     @media (prefers-colors-scheme: dark) {
-        
-        :root{
-                --color-text: 232, 238, 253;
-                --color-background: 2, 9, 29;
-                --color-primary: 179, 199, 255;
-                --color-secondary: 5, 20, 61;
-                --color-accent: 34, 88, 236;
-        
-            }
-        
+
+        :root {
+            --color-text: 232, 238, 253;
+            --color-background: 0, 0, 25;
+            --color-primary: 179, 199, 255;
+            --color-secondary: 5, 20, 61;
+            --color-accent: 34, 88, 236;
+
+        }
+
     }
 
 }

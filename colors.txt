@@ -1,6 +1,6 @@
 colors: {
  'text': '#020817',
- 'background': '#e2e9fd',
+ 'background': '#FAFAFF',
  'primary': '#00144d',
  'secondary': '#c2d1fa',
  'accent': '#1349dd',
@@ -11,7 +11,7 @@ DarkMode
 
 colors: {
  'text': '#e8eefd',
- 'background': '#02091d',
+ 'background': '#000019',
  'primary': '#b3c7ff',
  'secondary': '#05143d',
  'accent': '#2258ec',

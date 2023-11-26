@@ -18,6 +18,9 @@ exports.login = async (req, res, next) => {
 		if (!valide) {
 			res.status(400).json("Mot de passe ou email invalide");
 		}
+
+		const token = jwt.sign(user, config.env.SECRET_JWT, { expiresIn: "1h" });
+
 		res.status(200).json(user);
 	} catch (err) {
 		next(err);
@@ -53,7 +56,7 @@ exports.signup = async (req, res, next) => {
 			console.error(err);
 		});
 
-		const user =new User({
+		const user = new User({
 			email,
 			username,
 			password: hashed,
