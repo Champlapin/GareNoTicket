@@ -88,7 +88,7 @@ exports.updateUser = async (req, res, next) => {
 		const { username, email } = req.body;
 		const newValues = { username, email };
 
-		const results = User.findByIdAndUpdate(userId, newValues);
+		const results = User.findByIdAndUpdate(userId, newValues, { new: true });
 
 		if (!results) {
 			res.status(400).json({ message: "l'utilisateur n'existe pas" });

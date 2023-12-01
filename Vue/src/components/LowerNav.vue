@@ -4,15 +4,16 @@ import { RouterLink } from 'vue-router'
 </script>
 
 <template>
-  <nav>
-    <nav class="my-5">
-      <RouterLink :to="{ name: 'login' }" class=" rounded p-2 mx-3 border-text border ">Login</RouterLink>
-      <RouterLink :to="{ name: 'home' }" class=" rounded p-2 mx-3 border-text border ">Home</RouterLink>
-      <RouterLink :to="{ name: 'signup' }" class=" rounded p-2 mx-3 border-text border ">signup</RouterLink>
-      <RouterLink :to="{ name: 'valet' }" class=" rounded p-2 mx-3 border-text border ">valet</RouterLink>
-      <RouterLink :to="{ name: 'profile' }" class=" rounded p-2 mx-3 border-text border ">profile</RouterLink>
-      <RouterLink :to="{ name: 'deplacement' }" class=" rounded p-2 mx-3 border-text border ">deplacement</RouterLink>
-      <RouterLink :to="{ name: 'transaction' }" class=" rounded p-2 mx-3 border-text border ">Transactions</RouterLink>
+  <div class="bg-secondary py-2 mb-2 shadow-sm shadow-text border border-text border-opacity-20">
+    <nav>
+      <nav class="flex justify-around text-center">
+        <RouterLink :to="{ name: 'profile' }" active-class=" bg-text text-secondary"
+          class=" border-2 transition-all active:bg-text active:text-secondary border-text  shadow-text shadow-sm rounded p-2 text-lg  w-4/12 ">
+          Profile</RouterLink>
+        <RouterLink :to="{ name: 'transaction' }" active-class=" bg-text text-secondary"
+          class="border-2 transition-all active:bg-text active:text-secondary border-text  shadow-text shadow-sm rounded p-2 text-lg  w-4/12">
+          Transactions</RouterLink>
+      </nav>
     </nav>
-  </nav>
+  </div>
 </template>

@@ -14,6 +14,9 @@ export default {
         primary: 'rgba(var(--color-primary), <alpha-value>)',
         secondary: 'rgba(var(--color-secondary), <alpha-value>)',
         accent: 'rgba(var(--color-accent), <alpha-value>)',
+        white: 'rgba(var(--color-white), <alpha-value>)',
+        error: 'rgba(var(--color-error), <alpha-value>)',
+        special: 'rgba(var(--color-special), <alpha-value>)',
         dark: {
           text: '#e8eefd',
           background: '#02091d',

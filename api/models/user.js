@@ -6,7 +6,6 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema(
 	{
 		email: {
-			//TODO : N'est pas déjà utilisé ; Pas plus de 50 caractères.
 			type: String,
 			required: true,
 			unique: true,
@@ -15,12 +14,13 @@ const userSchema = new Schema(
 		username: {
 			type: String,
 			required: true,
-			match: [/^[a-zA-Z0-9_\s]{3,50}$/]
-			//TODO: Ajouter la validation
+			match: [/^.{3,50}$/],
+			unique: true,
 		},
 		password: {
 			type: String,
 			required: true,
+			match: [/^.{6,}$/],
 		},
 		isValet: {
 			type: Boolean,

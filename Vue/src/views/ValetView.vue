@@ -3,6 +3,7 @@ import mapComponent from '../components/mapComponent.vue';
 import locationIcon from '../components/icons/locationIcon.vue';
 import LowerNav from '../components/LowerNav.vue';
 import CarIcon from '../components/icons/CarIcon.vue';
+import { useAuthStore } from '../stores/userStore'
 
 //TODO : Créer une distinction entre ce que le valet voit et l'utilisateur normale. Pour ça, on va utliser une bordure verte ou shadow vert.
 </script>
@@ -12,7 +13,6 @@ import CarIcon from '../components/icons/CarIcon.vue';
         <div class="my-4">
             <div class=" container mx-auto">
                 <div class=" border-text border rounded-lg w-7/12 mx-auto border-opacity-20">
-                    <LowerNav/>
                     <mapComponent />
                     <div class="py-2 border-t ">
                         <p class="text-md w-11/12 mx-auto">Informations des voitures</p>

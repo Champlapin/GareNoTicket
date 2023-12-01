@@ -33,9 +33,9 @@ app.use((req, res, next) => {
 
 // Utilisation des routes en tant que middleware
 app.use("/auth", authRoutes);
-app.use(userRoutes);
-app.use(historiqueRoutes);
-app.use(dbRoutes);
+app.use("/user", userRoutes);
+app.use("/hist", historiqueRoutes);
+app.use("db", dbRoutes);
 
 mongoose
 	.connect(MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true })

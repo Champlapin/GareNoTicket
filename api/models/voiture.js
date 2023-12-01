@@ -19,7 +19,8 @@ const voitureSchema = new Schema(
 		},
 		plaque: {
 			type: String,
-			match: [/^[A-Za-z0-9]{3}\s[A-Za-z0-9]{3}$/],
+			match: [/^.{6}$/],
+			unique: true,
 		},
 		valet: {
 			type: Schema.Types.ObjectId,

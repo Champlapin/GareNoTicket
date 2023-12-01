@@ -12,16 +12,47 @@ exports.login = async (req, res, next) => {
 	try {
 		//TODO : Confirmer avec le prof.
 		//TODO : mettre dans un JWT
-		let user = await User.findOne({ email });
-		let valide = await bcrypt.compare(password, user.password);
-
-		if (!valide) {
-			res.status(400).json("Mot de passe ou email invalide");
+		if (!email || email.trim === "") {
+			res.status(400).json({
+				email: true,
+				message: "Le champ email est vide.",
+			});
+		} else if (!password || password.trim === "") {
+			res.status(400).json({
+				password: true,
+				message: "le champ password est vide.",
+			});
 		}
 
-		const token = jwt.sign(user, config.env.SECRET_JWT, { expiresIn: "1h" });
+		let user = await User.findOne({ email }).populate("voiture");
+		if (!user) {
+			res
+				.status(400)
+				.json({ email: false, message: "Aucun utilisateur avec ce email." });
+		}
+		let valide = await bcrypt.compare(password, user.password);
+		if (!valide) {
+			res
+				.status(400)
+				.json({ password: false, message: "Mot de passe est invalide" });
+		}
 
-		res.status(200).json(user);
+		const token = await jwt.sign(
+			{
+				user: {
+					username: user.username,
+					email: user.email,
+					id: user.id,
+					isValet: user.isValet,
+					voiture: user.voiture,
+				},
+			},
+			config.SECRET_JWT,
+			//TODO : changer la date d'expiration.
+			{ expiresIn: "4h" }
+		);
+
+		res.status(200).json({ jwt: token, email: true, password: true });
 	} catch (err) {
 		next(err);
 	}
@@ -32,8 +63,20 @@ exports.signup = async (req, res, next) => {
 
 	try {
 		//TODO : Will need to change this validation.
+		let message = "Les érreurs suivantes sont présentes";
+
+		if (!email) {
+			message += "\r le champ email est invalide";
+		}
+		if (!username) {
+			message += "\r le username est invalide";
+		}
+		if (!password) {
+			message += "\r le mot de passe est invalide ";
+		}
+
 		if (!email || !username || !password || !confirmPassword) {
-			return res.status(400).json({ message: "All fields are required." });
+			return res.status(400).json(message);
 		}
 
 		let existeDeja = await User.findOne({ email });
@@ -61,6 +104,7 @@ exports.signup = async (req, res, next) => {
 			username,
 			password: hashed,
 		});
+		console.log(user);
 		user.save();
 		res.status(200).json(user);
 	} catch (err) {

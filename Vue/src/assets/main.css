@@ -11,6 +11,9 @@
         --color-primary: 0, 20, 77;
         --color-secondary: 194, 209, 250;
         --color-accent: 19, 73, 221;
+        --color-white: 253, 253, 253;
+        --color-error: 179, 27, 27;
+        --color-special: 55, 181, 41;
     }
 
     :root[data-theme="dark"] {
@@ -19,7 +22,8 @@
         --color-primary: 179, 199, 255;
         --color-secondary: 5, 20, 61;
         --color-accent: 34, 88, 236;
-
+        --color-error: 255, 59, 59;
+        --color-special: 0, 200, 0;
     }
 
     @media (prefers-colors-scheme: dark) {
@@ -30,9 +34,14 @@
             --color-primary: 179, 199, 255;
             --color-secondary: 5, 20, 61;
             --color-accent: 34, 88, 236;
-
+            --color-error: 255, 59, 59;
+            --color-special: 0, 200, 0;
         }
-
     }
+}
 
+@layer components {
+    .input-1 {
+        @apply rounded-md py-1 my-1 px-2 border border-text  border-opacity-40 outline-none transition-all ring-0 focus:ring-accent focus:ring-1;
+    }
 }
