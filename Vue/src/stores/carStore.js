@@ -1,51 +1,57 @@
 import { defineStore } from 'pinia'
 import { jwtDecode } from 'jwt-decode'
+import { url } from '@vuelidate/validators'
+import { useAuthStore } from './userStore'
+
+
 
 export const useCarStore = defineStore({
-  id: 'AuthStore',
+  id: 'CarStore',
   state: () => ({
-    currentCar: null,
-    carList: null
+    currentCar: null
   }),
   getters: {
     getCar: (state) => state.currentCar
   },
   mutations: {
-    setState(state, newValue) {
+    setCar(state, newValue) {
       state.currentCar = newValue
     }
   },
   actions: {
-    async login(email, password) {
-      const login_URL = 'http://localhost:3000/auth/login'
+    async update(userId, voiture) {
+      const URL = `http://localhost:3000/car/${userId}`
 
-      await fetch(login_URL, {
-        method: 'POST',
+      const res = await fetch(URL, {
+        method: 'PUT',
         body: JSON.stringify({
-          email: email,
-          password: password
+          plaque: voiture.plaque,
+          marque: voiture.marque,
+          modele: voiture.modele,
+          couleur: voiture.couleur
         }),
         headers: {
-          'Content-type': 'application/json; charset=UTF-8'
+          'Content-type': 'application/json; charset=UTF-8',
+          'Access-Control-Allow-Origin': '*'
         }
       })
-        .then((response) => response.json())
-        .then((json) => {
-          console.log(!json.email)
-          console.log(!json.password)
 
-          if (!json.email) {
-            //TODO : Ajouter les messages de retour de la BD.
-            console.log(json.message)
-          } else if (!json.password) {
-            console.log(json.message)
-          } else {
-            localStorage.setItem('jwt', json.jwt)
-            return true
-          }
-          console.log(json)
-        })
-      return false
+      let token = await res.json()
+      console.log(res.status)
+      if (res.status == 200) {
+        const decoded = jwtDecode(token)
+        localStorage.setItem('jwt', token)
+
+        this.currentCar = decoded.voiture
+      }
+      return { voiture }
+    },
+    async getUsers() {
+      const URL = `http://localhost:3000/users/`
+
+      const res = fetch(URL)
+
+      return res.json()
     }
   }
 })

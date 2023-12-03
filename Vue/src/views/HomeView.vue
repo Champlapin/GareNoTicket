@@ -2,6 +2,7 @@
 import MapComponent from '../components/mapComponent.vue';
 import locationIcon from '../components/icons/locationIcon.vue'
 import { useAuthStore } from '../stores/userStore'
+import { useCarStore } from '../stores/carStore';
 import CarIcon from '../components/icons/CarIcon.vue';
 import CarGoIcon from '../components/icons/CarGoIcon.vue';
 import ParkingIcon from '../components/icons/ParkingIcon.vue';
@@ -17,6 +18,7 @@ export default {
   },
   created() {
     this.$userStore = useAuthStore();
+    this.$carStore = useCarStore();
   },
 
   components: { ParkingIcon }
@@ -31,7 +33,7 @@ export default {
       <div class=" container mx-auto">
         <div class=" border-text border rounded-lg w-6/12 mx-auto border-opacity-20 shadow-sm">
           <MapComponent  />
-          <div v-if="$userStore.user.voiture" class="py-4 flex justify-center">
+          <div v-if="$carStore.getCar" class="py-4 flex justify-center">
             <button
               class="flex fill-primary hover:fill-background border border-primary shadow-primary p-1 hover:bg-primary hover:text-background transition-all active:bg-accent active:border-accent shadow-sm mx-4 rounded-sm">
               Garer

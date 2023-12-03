@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { jwtDecode } from 'jwt-decode'
+import { useCarStore } from './carStore'
 
 export const useAuthStore = defineStore({
   id: 'AuthStore',
@@ -8,11 +9,23 @@ export const useAuthStore = defineStore({
   }),
   getters: {
     getUser: (state) => state.user,
-    isValet: (state) => state.user.isValet,
-    isMoving: (state) => state.user.voiture.isMoving
+    isValet: (state) => {
+      if (state.user) {
+        return state.user.isValet
+      }
+      return false
+    },
+    isMoving: (state) => {
+      if (!state.user) {
+        return false
+      }
+      if (state.user.voiture) {
+        return state.user.voiture.isMoving
+      } else return false
+    }
   },
   mutations: {
-    setState(state, newValue) {
+    setUser(state, newValue) {
       state.user = newValue
     }
   },
@@ -29,8 +42,9 @@ export const useAuthStore = defineStore({
         headers: {
           'Content-type': 'application/json; charset=UTF-8'
         }
+      }).then((results) => {
+        return results.json()
       })
-      console.log(res)
 
       if (!res.email) {
         //TODO : Ajouter les messages de retour de la BD.
@@ -40,7 +54,13 @@ export const useAuthStore = defineStore({
       }
       const token = res.jwt
       localStorage.setItem('jwt', token)
-      this.user = jwtDecode(token)
+
+      const $carStore = useCarStore()
+      console.log(token)
+      const jwt = jwtDecode(token)
+      this.user = jwt.user
+      console.log(jwt)
+      $carStore.currentCar = jwt.user.voiture
       return true
     },
     async signup(email, username, password, confirmPassword) {
@@ -58,12 +78,16 @@ export const useAuthStore = defineStore({
           'Content-type': 'application/json; charset=UTF-8'
         }
       })
-    },
-    async update(user, voiture, context) {
-      const updateUser_URL = `http://localhost:3000/user/${user.id}`
-      const updateCar_URL = ``
 
-      const user_res = await fetch(updateUser_URL, {
+      if (res.username) {
+        return true
+      }
+      return false
+    },
+    async update(user) {
+      const updateUser_URL = `http://localhost:3000/user/${user.id}`
+      console.log('in the update')
+      const res = await fetch(updateUser_URL, {
         method: 'PUT',
         body: JSON.stringify({
           username: user.username,
@@ -71,40 +95,24 @@ export const useAuthStore = defineStore({
         }),
         headers: {
           //TODO : Poser la question.
-          'Content-type': 'application/json; charset=UTF-8'
+          'Content-type': 'application/json; charset=UTF-8',
+          'Access-Control-Allow-Origin': '*'
         }
       })
-      console.log(user_res)
+      if (res.status == 200) {
+        const token = await res.json()
+        localStorage.setItem("jwt", token)
+        const decoded = jwtDecode(token)
+        const newUser = decoded.user
 
-      if (this.user.voiture) {
-        const car_res = await fetch(updateUser_URL, {
-          method: 'PUT',
-          body: JSON.stringify({
-            plaque: voiture.plaque,
-            marque: voiture.marque,
-            modele: voiture.modele,
-            couleur: voiture.couleur
-          }),
-          headers: {
-            //TODO : Poser la question.
-            'Content-type': 'application/json; charset=UTF-8'
-          }
-        })
-        console.log(car_res)
-      } else {
-        const car_res = await fetch(updateUser_URL, {
-          method: 'POST',
-          body: JSON.stringify({
-            username: user.username,
-            email: user.email
-          }),
-          headers: {
-            //TODO : Poser la question.
-            'Content-type': 'application/json; charset=UTF-8'
-          }
-        })
-        console.log(car_res)
+        this.user = {
+          email: newUser.email,
+          id: newUser.id,
+          isValet: newUser.isValet,
+          username: newUser.username
+        }
       }
+      return res
     }
   }
 })

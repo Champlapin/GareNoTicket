@@ -4,8 +4,28 @@ import locationIcon from '../components/icons/locationIcon.vue';
 import LowerNav from '../components/LowerNav.vue';
 import CarIcon from '../components/icons/CarIcon.vue';
 import { useAuthStore } from '../stores/userStore'
+import { useCarStore } from '../stores/carStore';
 
 //TODO : Créer une distinction entre ce que le valet voit et l'utilisateur normale. Pour ça, on va utliser une bordure verte ou shadow vert.
+</script>
+
+<script>
+
+export default {
+    data() {
+        return {
+            userList: null
+        }
+    },
+    created() {
+        this.$carStore = useCarStore()
+    },
+
+    beforeMount() {
+        this.userlist = this.$carStore.getUsers
+    },
+}
+
 </script>
 
 <template>
@@ -45,24 +65,24 @@ import { useAuthStore } from '../stores/userStore'
                                     </div>
                                 </div>
                             </div>
-                             <div class="text-sm border-text border-b border-opacity-10 mx-3 py-2">
-                                    <div class="flex ">
-                                        <div class="w-1/12 ">James</div>
-                                        <div class="w-2/12 ">Toyota</div>
-                                        <div class="w-2/12 ">Corolla</div>
-                                        <div class="w-2/12 ">123 ABC</div>
-                                        <div class="w-2/12">Bleu</div>
-                                        <div class="w-2/12 ">Demain</div>
-                                        <div class="w-1/12 flex justify-between">
-                                            <button>
-                                                <locationIcon class="mx-1" />
-                                            </button>
-                                            <button>
-                                                <CarIcon />
-                                            </button>
-                                        </div>
+                            <div class="text-sm border-text border-b border-opacity-10 mx-3 py-2">
+                                <div class="flex ">
+                                    <div class="w-1/12 ">James</div>
+                                    <div class="w-2/12 ">Toyota</div>
+                                    <div class="w-2/12 ">Corolla</div>
+                                    <div class="w-2/12 ">123 ABC</div>
+                                    <div class="w-2/12">Bleu</div>
+                                    <div class="w-2/12 ">Demain</div>
+                                    <div class="w-1/12 flex justify-between">
+                                        <button>
+                                            <locationIcon class="mx-1" />
+                                        </button>
+                                        <button>
+                                            <CarIcon />
+                                        </button>
                                     </div>
                                 </div>
+                            </div>
                         </div>
                     </div>
                 </div>

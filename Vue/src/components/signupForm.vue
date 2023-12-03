@@ -25,7 +25,7 @@ export default {
       const res = this.$userStore.signup(this.Email,this.username,this.password,this.confirmPassword)
 
       if (res) {
-        this.router.push({ name: 'login' });
+        this.$router.push({ name: 'login' });
       }
       else {
         //TODO : Afficher les messages érreurs soit avec toasts ou les champs

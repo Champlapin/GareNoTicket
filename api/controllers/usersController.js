@@ -5,6 +5,7 @@ const Voiture = require("../models/voiture");
 const Histo = require("../models/historique");
 const config = require("../config");
 const user = require("../models/user");
+const jwt = require("jsonwebtoken");
 const url_base = config.URL + ":" + config.PORT;
 
 /**
@@ -20,6 +21,15 @@ async function checkUserExists(userId) {
 		throw error;
 	}
 	return user;
+}
+
+/**
+ * checks if the input is null or whitespaces
+ * @param {*} input The input
+ * @returns 
+ */true;
+function isNullOrWhitespace(input) {
+	return !input || !input.trim();
 }
 
 exports.getUsers = async (req, res, next) => {
@@ -88,12 +98,30 @@ exports.updateUser = async (req, res, next) => {
 		const { username, email } = req.body;
 		const newValues = { username, email };
 
-		const results = User.findByIdAndUpdate(userId, newValues, { new: true });
+		let newUser = await User.findByIdAndUpdate(userId, newValues, {
+			new: true,
+		}).populate("voiture");
 
-		if (!results) {
+		if (!newUser) {
 			res.status(400).json({ message: "l'utilisateur n'existe pas" });
 		}
-		res.status(200).json(results);
+
+		const token = await jwt.sign(
+			{
+				user: {
+					username: newUser.username,
+					email: newUser.email,
+					id: newUser.id,
+					isValet: newUser.isValet,
+				},
+				voiture: newUser.voiture,
+			},
+			config.SECRET_JWT,
+			//TODO : changer la date d'expiration.
+			{ expiresIn: "4h" }
+		);
+
+		res.status(200).json(token);
 	} catch (error) {
 		next(error);
 	}
@@ -101,21 +129,44 @@ exports.updateUser = async (req, res, next) => {
 
 exports.updateCar = async (req, res, next) => {
 	try {
+		let results;
 		let userId = req.params.userId;
-		const { marque, modele, couleur, immatriculation } = req.body;
-		const newValues = { marque, modele, couleur, immatriculation };
+		const { marque, modele, couleur, plaque } = req.body;
+		const newValues = { marque, modele, couleur, plaque };
 
-		let user = User.findById(userId);
+		let user = await checkUserExists(userId);
 		if (!user) {
 			res.status(400).json({ message: "l'utilisateur n'existe pas." });
 		}
+		//TODO : Valider les données entrants
 
-		const results = Voiture.findById(user.voiture, newValues);
-		if (!results) {
-			res.status(400).json({ message: "l'utilisateur n'a pas de voiture." });
+		if (user.voiture) {
+			results = await Voiture.findByIdAndUpdate(user.voiture, newValues, {
+				new: true,
+			});
+		} else {
+			results = new Voiture(newValues);
+			const res = await results.save();
+			user.voiture = results;
+			await user.save();
 		}
+		user = await User.findById(userId).populate("voiture");
+		const token = await jwt.sign(
+			{
+				user: {
+					username: user.username,
+					email: user.email,
+					id: user.id,
+					isValet: user.isValet,
+				},
+				voiture: user.voiture,
+			},
+			config.SECRET_JWT,
+			//TODO : changer la date d'expiration.
+			{ expiresIn: "4h" }
+		);
 
-		res.status(200).json(results);
+		res.status(200).json(token);
 	} catch (error) {
 		next(error);
 	}

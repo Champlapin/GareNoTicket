@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../stores/userStore'
+import { useCarStore } from '../stores/carStore'
 import HomeView from '../views/HomeView.vue'
 import LoginView from '../views/LoginView.vue'
 import SignupView from '../views/SignupView.vue'
@@ -68,7 +69,8 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  let store = useAuthStore()
+  let $userStore = useAuthStore()
+  let $carStore = useCarStore()
 
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     const token = localStorage.getItem('jwt')
@@ -76,8 +78,8 @@ router.beforeEach((to, from, next) => {
       next({ name: 'login' })
     } else {
       const decoded = jwtDecode(token)
-      store.$state.user = decoded.user
-      console.log(decoded.user)
+      $userStore.user = decoded.user
+      $carStore.currentCar = decoded.voiture
       const now = Date.now() / 1000
       if (decoded.exp < now) {
         localStorage.removeItem('jwt')
@@ -85,7 +87,7 @@ router.beforeEach((to, from, next) => {
       }
 
       if (to.matched.some((record) => record.meta.requiresValet)) {
-        if (store.$state.user.isValet) {
+        if ($userStore.$state.user.isValet) {
           next()
         } else {
           next({ name: 'home' })

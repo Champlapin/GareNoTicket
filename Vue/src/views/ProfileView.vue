@@ -3,7 +3,7 @@ import { useToast } from 'vue-toast-notification'
 import { useAuthStore } from '../stores/userStore'
 import { useCarStore } from '../stores/carStore'
 import LowerNav from '../components/LowerNav.vue';
-import { required, email, minLength, maxLength, sameAs, helpers, not } from '@vuelidate/validators'
+import { required, email, minLength, maxLength, helpers, not } from '@vuelidate/validators'
 import InfoIcon from '../components/icons/InfoIcon.vue';
 import { useVuelidate } from '@vuelidate/core';
 import 'vue-toast-notification/dist/theme-sugar.css';
@@ -15,7 +15,7 @@ import 'vue-toast-notification/dist/theme-sugar.css';
 export default {
     data() {
         return {
-            v$: useVuelidate(),
+            $v: useVuelidate(),
             username: '',
             Email: '',
             plaque: '',
@@ -27,26 +27,30 @@ export default {
     created() {
         this.$userStore = useAuthStore();
         this.$toast = useToast();
+        this.$carStore = useCarStore();
         const user = this.$userStore.user;
+        const car = this.$carStore.currentCar
 
         this.username = user.username
         this.Email = user.email
-        if (user.voiture) {
-            this.plaque = user.voiture.plaque
-            this.marque = user.voiture.marque
-            this.modele = user.voiture.modele
-            this.couleur = user.voiture.couleur
+        if (car) {
+            this.plaque = car.plaque
+            this.marque = car.marque
+            this.modele = car.modele
+            this.couleur = car.couleur
         }
     },
     methods: {
         async onSubmit() {
+
             const user = { id: this.$userStore.user.id, username: this.username, email: this.Email }
             const voiture = { plaque: this.plaque, marque: this.marque, modele: this.modele, couleur: this.couleur }
 
-            // const res = this.$userStore.update(user, voiture)
-            const res = true
-            if (res) {
+            const userRes = await this.$userStore.update(user)
+            const carRes = await this.$carStore.update(user.id, voiture)
+            if (userRes) {
                 //TODO : Afficher le toast succés
+                
                 this.$toast.success("Modifications enregistrés avec succès.", { position: 'top-right', duration: 5000, showProgressBar: true });
             }
             else {
@@ -111,46 +115,46 @@ export default {
                 <div class=" mx-auto w-10/12">
                     <div class="flex flex-col">
                         <label for="username">Nom d'utilisateur</label>
-                        <input @blur="v$.username.$touch" id="username" class=" input-1 border" type="text"
+                        <input @blur="$v.username.$touch" id="username" class=" input-1 border" type="text"
                             v-model="username">
-                        <div class="text-sm text-text text-opacity-40" v-for="error of v$.username.$errors"
+                        <div class="text-sm text-text text-opacity-40" v-for="error of $v.username.$errors"
                             :key="error.uid">
                             {{ error.$message }}
                         </div>
                     </div>
                     <div class="flex flex-col ">
                         <label for="email">Email</label>
-                        <input @blur="v$.Email.$touch" id="email" class="input-1" type="text" v-model="Email">
-                        <div class="text-sm text-text text-opacity-40" v-for="error of v$.Email.$errors" :key="error.uid">
+                        <input @blur="$v.Email.$touch" id="email" class="input-1" type="text" v-model="Email">
+                        <div class="text-sm text-text text-opacity-40" v-for="error of $v.Email.$errors" :key="error.uid">
                             {{ error.$message }}
                         </div>
                     </div>
                     <p class=" font-bold text-xl">Voiture</p>
                     <div class="flex flex-col">
                         <label for="plaque">Plaque</label>
-                        <input @blur="v$.plaque.$touch" id="plaque" class=" input-1 " type="text" v-model="plaque">
-                        <div class="text-sm text-text text-opacity-40" v-for="error of v$.plaque.$errors" :key="error.uid">
+                        <input @blur="$v.plaque.$touch" id="plaque" class=" input-1 " type="text" v-model="plaque">
+                        <div class="text-sm text-text text-opacity-40" v-for="error of $v.plaque.$errors" :key="error.uid">
                             {{ error.$message }}
                         </div>
                     </div>
                     <div class="flex flex-col">
                         <label for="marque">Marque</label>
-                        <input @blur="v$.marque.$touch" id="marque" class=" input-1 " type="text" v-model="marque">
-                        <div class="text-sm text-text text-opacity-40" v-for="error of v$.marque.$errors" :key="error.uid">
+                        <input @blur="$v.marque.$touch" id="marque" class=" input-1 " type="text" v-model="marque">
+                        <div class="text-sm text-text text-opacity-40" v-for="error of $v.marque.$errors" :key="error.uid">
                             {{ error.$message }}
                         </div>
                     </div>
                     <div class="flex flex-col">
                         <label for="modele">Modèle</label>
-                        <input @blur="v$.modele.$touch" class=" input-1 " id="Modele" type="text" v-model="modele">
-                        <div class="text-sm text-text text-opacity-40" v-for="error of v$.modele.$errors" :key="error.uid">
+                        <input @blur="$v.modele.$touch" class=" input-1 " id="Modele" type="text" v-model="modele">
+                        <div class="text-sm text-text text-opacity-40" v-for="error of $v.modele.$errors" :key="error.uid">
                             {{ error.$message }}
                         </div>
                     </div>
                     <div class="flex flex-col">
                         <label for="couleur">Couleur</label>
-                        <input @blur="v$.couleur.$touch" id="couleur" class=" input-1 " type="text" v-model="couleur">
-                        <div class="text-sm text-text text-opacity-40" v-for="error of v$.couleur.$errors" :key="error.uid">
+                        <input @blur="$v.couleur.$touch" id="couleur" class=" input-1 " type="text" v-model="couleur">
+                        <div class="text-sm text-text text-opacity-40" v-for="error of $v.couleur.$errors" :key="error.uid">
                             {{ error.$message }}
                         </div>
                     </div>

@@ -44,8 +44,8 @@ exports.login = async (req, res, next) => {
 					email: user.email,
 					id: user.id,
 					isValet: user.isValet,
-					voiture: user.voiture,
 				},
+				voiture: user.voiture,
 			},
 			config.SECRET_JWT,
 			//TODO : changer la date d'expiration.

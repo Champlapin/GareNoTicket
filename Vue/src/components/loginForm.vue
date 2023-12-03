@@ -24,15 +24,15 @@ export default {
       //let valide = await this.v$.$validate()
 
       try {
-        const response = this.$store.login(this.Email, this.password)
-       if (response) {
-         this.$router.push({name : 'home'});
-       }
+        const response = await this.$store.login(this.Email, this.password)
+        if (response) {
+          this.$router.push({ name: 'home' });
+        }
       } catch (err) {
         console.log(err.message)
       }
 
-      
+
     },
     toggleDarkMode() {
       this.isDark = this.isDark ? false : true;
@@ -69,27 +69,24 @@ export default {
             <label class="" for="email">Email</label>
             <!--TODO : Changer l'ethétique des inputs pour ue le label soit dans le champs.-->
             <!--TODO : Demander quel messages afficher sur login.-->
-            <input
-              class=" input-1 "
-              @blur="v$.Email.$touch" placeholder="john@gmail.com" id="email" type="text" v-model.trim="Email" />
+            <input class=" input-1 " @blur="v$.Email.$touch" placeholder="john@gmail.com" id="email" type="text"
+              v-model.trim="Email" />
             <div class="text-sm text-text text-opacity-40" v-for="error of v$.password.$errors" :key="error.uid">
 
             </div>
           </div>
           <div class="flex flex-col my-1">
             <label for="password">Mot de passe</label>
-            <input
-              class="input-1"
-              @blur="v$.password.$touch" id="password" type="password" v-model.trim="password" />
+            <input class="input-1" @blur="v$.password.$touch" id="password" type="password" v-model.trim="password" />
             <div class="text-sm text-text text-opacity-40" v-for="error of v$.password.$errors" :key="error.uid">
 
             </div>
           </div>
-            <div class="py-1 my-2 mx-auto">
-              <button type="submit"
-                class="p-2 rounded-lg bg-primary text-background text shadow-md hover:shadow-accent hover:bg-accent transition-all duration-200 ">Me
-                connecter</button>
-            </div>
+          <div class="py-1 my-2 mx-auto">
+            <button type="submit"
+              class="p-2 rounded-lg bg-primary text-background text shadow-md hover:shadow-accent hover:bg-accent transition-all duration-200 ">Me
+              connecter</button>
+          </div>
           <div class="my-2">
             <p class="text-sm text-center">Vous n'avez pas de compte ? <RouterLink
                 class="font-bold hover:border-opacity-100 border-b border-opacity-0 border-text duration-300 transition-all hover:text-accent hover:border-accent"
