@@ -4,8 +4,9 @@ import { RouterLink } from 'vue-router'
 </script>
 
 <template>
+  <div class="bg-text py-5 bg-opacity-5 shadow-md ">
     <nav>
-        <nav class="my-5">
+        <nav>
           <RouterLink :to="{ name: 'login' }" class=" rounded p-2 mx-3 border-text border ">Login</RouterLink>
           <RouterLink :to="{ name: 'home' }" class=" rounded p-2 mx-3 border-text border ">Home</RouterLink>
           <RouterLink :to="{ name: 'signup' }" class=" rounded p-2 mx-3 border-text border ">signup</RouterLink>
@@ -15,4 +16,5 @@ import { RouterLink } from 'vue-router'
             <RouterLink :to="{ name: 'transaction' }" class=" rounded p-2 mx-3 border-text border ">Transactions</RouterLink>
         </nav>
       </nav>
+  </div>
 </template>

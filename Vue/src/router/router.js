@@ -18,7 +18,7 @@ const router = createRouter({
       name: 'home',
       component: HomeView,
       meta: {
-        requiresAuth: true,
+        requiresAuth: true
       }
     },
     {
@@ -73,6 +73,7 @@ router.beforeEach((to, from, next) => {
   let $carStore = useCarStore()
 
   if (to.matched.some((record) => record.meta.requiresAuth)) {
+    //TODO : faire un fetch à la bd pour resetter le token au rechargement.
     const token = localStorage.getItem('jwt')
     if (!token) {
       next({ name: 'login' })
@@ -97,7 +98,7 @@ router.beforeEach((to, from, next) => {
           next()
         } catch (e) {
           localStorage.removeItem('jwt')
-          next({ name: 'login' })   
+          next({ name: 'login' })
         }
       }
     }

@@ -3,10 +3,10 @@ import MapComponent from '../components/mapComponent.vue';
 import locationIcon from '../components/icons/locationIcon.vue'
 import { useAuthStore } from '../stores/userStore'
 import { useCarStore } from '../stores/carStore';
-import CarIcon from '../components/icons/CarIcon.vue';
 import CarGoIcon from '../components/icons/CarGoIcon.vue';
 import ParkingIcon from '../components/icons/ParkingIcon.vue';
 import { RouterLink } from 'vue-router'
+import { useToast } from 'vue-toast-notification';
 
 </script>
 
@@ -14,14 +14,42 @@ import { RouterLink } from 'vue-router'
 export default {
   data() {
     return {
+      user: null,
     };
   },
   created() {
     this.$userStore = useAuthStore();
-    this.$carStore = useCarStore();
-  },
+    this.user = this.$userStore.user
 
-  components: { ParkingIcon }
+    this.$carStore = useCarStore();
+    this.car = this.$carStore.currentCar
+
+    this.$toast = useToast()
+  },
+  methods: {
+    async setCarParkingStatus(isParking) {
+      const res = await this.$carStore.setParking(this.$userStore.user.id, isParking)
+
+      let action = isParking ? "garé" : "récuperé";
+      let successMessage = `Vous avez ${action} votre voiture.`;
+      let errorMessage = "Une érreur s'est produite lors de la requête.";
+
+      if (res.status == 200) {
+        this.$toast.success(successMessage, { position: 'top-right', duration: 5000, showProgressBar: true });
+        if (!isParking) {
+          this.$emit('update-data', 'Vue');
+        }
+      }
+      else {
+        this.$toast.error(errorMessage, { position: 'top-right', duration: 5000, showProgressBar: true });
+      }
+    },
+
+    setViewToCar() {
+
+    },
+  },
+  components: { ParkingIcon, MapComponent }
 }
 
 </script>
@@ -29,26 +57,27 @@ export default {
 
 <template>
   <div>
-    <div class="my-4">
-      <div class=" container mx-auto">
-        <div class=" border-text border rounded-lg w-6/12 mx-auto border-opacity-20 shadow-sm">
-          <MapComponent  />
+    <div class="my-auto">
+      <div class=" container mx-auto h-full">
+        <div
+          class=" border-text border rounded-lg lg:w-6/12 md:w-8/12 sm:w-10/12 w-11/12 mx-auto border-opacity-20 shadow-sm">
+          <MapComponent />
           <div v-if="$carStore.getCar" class="py-4 flex justify-center">
-            <button
-              class="flex fill-primary hover:fill-background border border-primary shadow-primary p-1 hover:bg-primary hover:text-background transition-all active:bg-accent active:border-accent shadow-sm mx-4 rounded-sm">
+            <button @click="setCarParkingStatus(true)" type="button" :disabled="$carStore.isParked"
+              :class="[!this.$carStore.isParked ? 'btn-active' : 'btn-inactive']">
               Garer
               <span class="text-bold fill-inherit">
                 <ParkingIcon class=" fill-inherit" />
               </span>
             </button>
-            <button
-              class=" flex fill-primary hover:fill-background border border-primary shadow-primary p-1 hover:bg-primary hover:text-background transition-all active:bg-accent active:border-accent shadow-sm mx-4 rounded-sm">
+            <button @click="setCarParkingStatus(false)" type="button" :disabled="!$carStore.isParked"
+              :class="[this.$carStore.isParked ? 'btn-active' : 'btn-inactive']" class="">
               Récuperer
               <span class="text-bold ">
                 <CarGoIcon class=" fill-inherit" />
               </span>
             </button>
-            <button>
+            <button @click="setViewToCar" type="button" class="">
               <locationIcon class="fill-primary hover:fill-accent transition-all active:fill-secondary" />
             </button>
           </div>
@@ -62,4 +91,5 @@ export default {
         </div>
       </div>
     </div>
-  </div></template>
+  </div>
+</template>

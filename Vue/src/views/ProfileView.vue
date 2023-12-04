@@ -59,7 +59,6 @@ export default {
         }
     },
     validations() {
-
         return {
             username: {
                 required: helpers.withMessage('Ce champ est obligatoire', required),

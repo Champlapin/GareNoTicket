@@ -26,8 +26,8 @@ async function checkUserExists(userId) {
 /**
  * checks if the input is null or whitespaces
  * @param {*} input The input
- * @returns 
- */true;
+ * @returns
+ */ true;
 function isNullOrWhitespace(input) {
 	return !input || !input.trim();
 }
@@ -131,8 +131,8 @@ exports.updateCar = async (req, res, next) => {
 	try {
 		let results;
 		let userId = req.params.userId;
-		const { marque, modele, couleur, plaque } = req.body;
-		const newValues = { marque, modele, couleur, plaque };
+		//const { marque, modele, couleur, plaque } = req.body;
+		const newValues = req.body;
 
 		let user = await checkUserExists(userId);
 		if (!user) {

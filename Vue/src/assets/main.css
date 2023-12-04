@@ -44,4 +44,14 @@
     .input-1 {
         @apply rounded-md py-1 my-1 px-2 border border-text  border-opacity-40 outline-none transition-all ring-0 focus:ring-accent focus:ring-1;
     }
+    .btn-base{
+        @apply fill-background p-1 bg-primary text-background transition-all flex p-1 border-primary shadow-sm shadow-primary border mx-4 rounded-sm
+    }
+
+    .btn-active{
+        @apply btn-base hover:bg-accent hover:border-accent;
+    }
+    .btn-inactive{
+        @apply btn-base opacity-60
+    }
 }

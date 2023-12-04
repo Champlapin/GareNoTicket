@@ -23,7 +23,7 @@ export default {
   <header>
     <navigationBar />
   </header>
-  <main>
+  <main class=" min-h-[80vh] my-8">
     <RouterView />
   </main>
 
