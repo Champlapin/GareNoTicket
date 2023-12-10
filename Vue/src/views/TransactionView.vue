@@ -19,27 +19,29 @@ import { useAuthStore } from '../stores/userStore'
                     <p>Historique de factures</p>
                     <div class="shadow-md shadow-text rounded-md border-text border border-opacity-20">
                         <div class="flex py-3 border-text border-b border-opacity-20">
-                            <div class="w-9/12 ms-1">
+                            <div class="w-9/12 ms-3">
                                 <p>Date</p>
                             </div>
                             <div class="">
                                 <p>Montant</p>
                             </div>
                         </div>
-                        <div class="flex py-3 border-text border-b border-opacity-20">
-                            <div class="w-9/12 ms-1">
-                                <p>2023-11-03 16 h 27 min 48 sec</p>
+                        <div>
+                            <div class="flex py-3 border-text border-b border-opacity-20">
+                                <div class="w-9/12 ms-3">
+                                    <p>2023-11-03 16 h 27 min 48 sec</p>
+                                </div>
+                                <div>
+                                    <p class="w-3/12 ">24$</p>
+                                </div>
                             </div>
-                            <div>
-                                <p class="w-3/12 ">24$</p>
-                            </div>
-                        </div>
-                        <div class="flex py-3 border-text border-b border-opacity-20">
-                            <div class="w-9/12 ms-1">
-                                <p>2023-11-15 13 h 42 min 17 sec</p>
-                            </div>
-                            <div>
-                                <p class="w-3/12">24$</p>
+                            <div class="flex py-3 border-text border-b border-opacity-20">
+                                <div class="w-9/12 ms-1">
+                                    <p>2023-11-15 13 h 42 min 17 sec</p>
+                                </div>
+                                <div>
+                                    <p class="w-3/12">24$</p>
+                                </div>
                             </div>
                         </div>
                         <div class="flex py-3">

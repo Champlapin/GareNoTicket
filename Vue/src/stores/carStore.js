@@ -6,19 +6,29 @@ import { useAuthStore } from './userStore'
 export const useCarStore = defineStore({
   id: 'CarStore',
   state: () => ({
-    currentCar: null
+    currentCar: null,
+    coords: null,
+    userslist: null
   }),
   getters: {
     getCar: (state) => state.currentCar,
-    isParked: (state) => state.currentCar.isParked,
-    getCoords: (state) => {
-      return { lat: state.currentCar.latitude, lng: state.currentCar.longitude }
+    isParked: (state) => {
+      return state.currentCar ? state.currentCar.isParked : false
     },
-    getTimeToleave: (state) => state.currentCar.timeToLeave
+    getCoords: (state) => {
+      return state.currentCar
+        ? { lat: state.currentCar.latitude, lng: state.currentCar.longitude }
+        : null
+    },
+    getTimeToleave: (state) => state.currentCar.timeToLeave,
+    getUsers: (state) => state.userslist
   },
   mutations: {
     setCar(state, newValue) {
       state.currentCar = newValue
+    },
+    setCoords(state, newValues) {
+      state.coords = newValues
     }
   },
   actions: {
@@ -95,8 +105,11 @@ export const useCarStore = defineStore({
         timeToLeave = this.calculerHeure()
         body = {
           isParked: isParked,
-          timeToLeave: timeToLeave
+          timeToLeave: timeToLeave,
+          longitude: this.coords.lng,
+          latitude: this.coords.lat
         }
+        console.log(body)
       } else {
         body = { isParked: isParked }
       }
@@ -120,12 +133,13 @@ export const useCarStore = defineStore({
       }
       return { status: res.status, message: token }
     },
-    async getUsers() {
+    async setUsers() {
       const URL = `http://localhost:3000/users/`
 
-      const res = fetch(URL)
+      const res = await fetch(URL)
+      let response = await res.json()
 
-      return res.json()
+      this.userslist = response.users
     }
   }
 })

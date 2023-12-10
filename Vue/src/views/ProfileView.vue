@@ -42,20 +42,26 @@ export default {
     },
     methods: {
         async onSubmit() {
+            if (!this.$carStore.isParked) {
 
-            const user = { id: this.$userStore.user.id, username: this.username, email: this.Email }
-            const voiture = { plaque: this.plaque, marque: this.marque, modele: this.modele, couleur: this.couleur }
+                const user = { id: this.$userStore.user.id, username: this.username, email: this.Email }
+                const voiture = { plaque: this.plaque, marque: this.marque, modele: this.modele, couleur: this.couleur }
 
-            const userRes = await this.$userStore.update(user)
-            const carRes = await this.$carStore.update(user.id, voiture)
-            if (userRes) {
-                //TODO : Afficher le toast succés
-                
-                this.$toast.success("Modifications enregistrés avec succès.", { position: 'top-right', duration: 5000, showProgressBar: true });
+                const userRes = await this.$userStore.update(user)
+                const carRes = await this.$carStore.update(user.id, voiture)
+                if (userRes) {
+                    //TODO : Afficher le toast succés
+
+                    this.$toast.success("Modifications enregistrés avec succès.", { position: 'top-right', duration: 5000, showProgressBar: true });
+                }
+                else {
+                    //TODO ; modifier les champs érronnés ou afficher un toast temporairement.
+                }
             }
             else {
-                //TODO ; modifier les champs érronnés ou afficher un toast temporairement.
+                this.$toast.error("Impossible de modifier l'auto lorsqu'elle est garé.", { position: 'top-right', duration: 5000, showProgressBar: true });
             }
+
         }
     },
     validations() {
@@ -104,7 +110,7 @@ export default {
             <LowerNav />
             <form @submit.prevent="onSubmit" class=" border-text rounded-sm">
 
-                <div v-if="$userStore.isMoving"
+                <div v-if="$carStore.isParked"
                     class="bg-accent rounded p-2 mx-1 flex justify-center my-4 shadow-text shadow">
                     <InfoIcon class="fill-background md:h-10 md:w-2/12 sm:h-12 sm:w-1/12" />
                     <p class="text-background text-sm mx-auto my-auto">Vous ne pouvez pas modifier votre compte si votre

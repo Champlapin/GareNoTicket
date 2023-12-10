@@ -23,21 +23,15 @@ async function checkUserExists(userId) {
 	return user;
 }
 
-/**
- * checks if the input is null or whitespaces
- * @param {*} input The input
- * @returns
- */ true;
-function isNullOrWhitespace(input) {
-	return !input || !input.trim();
-}
-
+// eslint-disable-next-line no-undef
 exports.getUsers = async (req, res, next) => {
 	try {
-		const users = await User.find({ isValet: false }).populate({
-			path: "voiture",
-			match: { isParked: true },
-		});
+		const users = await User.find({ isValet: false })
+			.select("email username _id")
+			.populate({
+				path: "voiture",
+				match: { isParked: true },
+			});
 
 		const filteredUsers = users.filter((user) => user.voiture != null);
 		if (!filteredUsers.length) {
@@ -54,6 +48,7 @@ exports.getUsers = async (req, res, next) => {
 	}
 };
 
+// eslint-disable-next-line no-undef
 exports.getUser = async (req, res, next) => {
 	try {
 		const userId = req.user.userId;
@@ -66,6 +61,7 @@ exports.getUser = async (req, res, next) => {
 	}
 };
 
+// eslint-disable-next-line no-undef
 exports.getUserBySession = async (req, res, next) => {
 	try {
 		const userId = req.params.id;
@@ -79,6 +75,7 @@ exports.getUserBySession = async (req, res, next) => {
 	}
 };
 
+// eslint-disable-next-line no-undef
 exports.getUserById = async (req, res, next) => {
 	try {
 		const userId = req.params.id;
@@ -92,6 +89,7 @@ exports.getUserById = async (req, res, next) => {
 	}
 };
 
+// eslint-disable-next-line no-undef
 exports.updateUser = async (req, res, next) => {
 	try {
 		let userId = req.params.userId;
@@ -127,14 +125,15 @@ exports.updateUser = async (req, res, next) => {
 	}
 };
 
+// eslint-disable-next-line no-undef
 exports.updateCar = async (req, res, next) => {
 	try {
 		let results;
 		let userId = req.params.userId;
-		//const { marque, modele, couleur, plaque } = req.body;
 		const newValues = req.body;
 
-		let user = await checkUserExists(userId);
+		let user = await User.findById(userId).populate("voiture");
+
 		if (!user) {
 			res.status(400).json({ message: "l'utilisateur n'existe pas." });
 		}
@@ -146,7 +145,7 @@ exports.updateCar = async (req, res, next) => {
 			});
 		} else {
 			results = new Voiture(newValues);
-			const res = await results.save();
+			await results.save();
 			user.voiture = results;
 			await user.save();
 		}
@@ -172,6 +171,7 @@ exports.updateCar = async (req, res, next) => {
 	}
 };
 
+// eslint-disable-next-line no-undef
 exports.deleteUser = async (req, res, next) => {
 	try {
 		const userId = req.user.userId;

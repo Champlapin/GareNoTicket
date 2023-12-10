@@ -49,7 +49,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/deplacement',
+      path: '/deplacement/:userId',
       name: 'deplacement',
       component: MoveView,
       meta: {
@@ -81,6 +81,16 @@ router.beforeEach((to, from, next) => {
       const decoded = jwtDecode(token)
       $userStore.user = decoded.user
       $carStore.currentCar = decoded.voiture
+      $carStore.coords = decoded.voiture
+        ? { lat: decoded.voiture.latitude, lng: decoded.voiture.longitude }
+        : null
+
+      if (decoded.user.isValet) {
+        $carStore.setUsers()
+      } else {
+        $carStore.userslist = null
+      }
+
       const now = Date.now() / 1000
       if (decoded.exp < now) {
         localStorage.removeItem('jwt')

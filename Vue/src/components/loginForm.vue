@@ -26,10 +26,12 @@ export default {
       try {
         const response = await this.$store.login(this.Email, this.password)
         if (response) {
+          //TODO : rediriger vers Valet si on est valet.
           this.$router.push({ name: 'home' });
         }
       } catch (err) {
         console.log(err.message)
+        //TODO : remmettre les érreurs du côté bd sur le côté client.
       }
 
 

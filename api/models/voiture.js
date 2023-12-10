@@ -37,11 +37,11 @@ const voitureSchema = new Schema(
 		},
 		latitude: {
 			type: Number,
-			default: 0,
+			default: 46.7922,
 		},
 		longitude: {
 			type: Number,
-			default: 0,
+			default: -71.2639,
 		},
 		timeToLeave: {
 			type: Date,

@@ -54,4 +54,13 @@
     .btn-inactive{
         @apply btn-base opacity-60
     }
+    .icon {
+        @apply fill-primary hover:fill-accent transition-all active:fill-secondary
+    }
+    .car-item{
+        @apply text-sm border-text border-b border-opacity-10 py-2 w-full transition-all
+    }
+    .selected-car{
+        @apply shadow-special bg-opacity-20 bg-special
+    }
 }

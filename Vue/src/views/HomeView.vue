@@ -46,7 +46,7 @@ export default {
     },
 
     setViewToCar() {
-
+      this.$refs.map.showCar()
     },
   },
   components: { ParkingIcon, MapComponent }
@@ -61,7 +61,7 @@ export default {
       <div class=" container mx-auto h-full">
         <div
           class=" border-text border rounded-lg lg:w-6/12 md:w-8/12 sm:w-10/12 w-11/12 mx-auto border-opacity-20 shadow-sm">
-          <MapComponent />
+          <MapComponent ref="map" />
           <div v-if="$carStore.getCar" class="py-4 flex justify-center">
             <button @click="setCarParkingStatus(true)" type="button" :disabled="$carStore.isParked"
               :class="[!this.$carStore.isParked ? 'btn-active' : 'btn-inactive']">
@@ -78,7 +78,7 @@ export default {
               </span>
             </button>
             <button @click="setViewToCar" type="button" class="">
-              <locationIcon class="fill-primary hover:fill-accent transition-all active:fill-secondary" />
+              <locationIcon  class="icon" />
             </button>
           </div>
           <div v-else class="text-center my-3">

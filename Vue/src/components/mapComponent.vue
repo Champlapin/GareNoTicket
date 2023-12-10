@@ -7,52 +7,78 @@ import { useCarStore } from '../stores/carStore'
 import { useRoute } from 'vue-router';
 import { mapState } from 'pinia';
 
-
 </script>
 
 <script>
 export default {
+    expose: ['showCarById', 'showCar'],
 
     data() {
         return {
             map: null,
-            voitures: null,
             coords: null,
+            markers: {},
         };
     },
 
-    created() {
+    async created() {
         this.$userStore = useAuthStore()
         this.$carStore = useCarStore()
         this.$route = useRoute()
         this.coords = this.$carStore.getCoords
+        //this.userslist = this.$carStore.getUsers()
 
     },
-    mounted() {
-        //Default map position set to the school.
+    async mounted() {
+        let carStore = this.$carStore
+
         let View = {
             position: [46.7922, -71.2639],
             zoom: 15
+            //Default map position set to the school.
         }
-        if (!this.$carStore.getCar) {
-            this.map = L.map('map').setView(View.position, View.zoom);
-        }
-        else {
-            View.position = this.$carStore.getCoords;
-            this.map = L.map('map').setView(View.position, View.zoom);
-            this.marker = L.marker(this.coords).addTo(this.map);
 
+        if (this.$userStore.isValet) {
+            const userslist = this.$carStore.userslist
+            this.map = L.map('map').setView(View.position, View.zoom);
 
-            if (!this.$carStore.isParked) {
-                this.marker.dragging.enable();
+            console.log(userslist)
+            if (userslist) {
+
+                if (userslist.length > 0) {
+                    const firstCar = userslist[0]
+                    View.position = { lat: firstCar.latitude, lng: firstCar.longitude }
+
+                    for (const user of userslist) {
+                        L.marker({ lat: user.voiture.latitude, lng: user.voiture.longitude }).addTo(this.map);
+                    }
+                }
             }
 
-            this.marker.on('dragend', function (e) {
-                const newCoords = e.target.getLatLng()
-                this.coords = [newCoords.lat, newCoords.lng];
-                console.log(this.coords)
-            })
         }
+        else {
+
+            if (!this.$carStore.getCar) {
+                this.map = L.map('map').setView(View.position, View.zoom);
+            }
+            else {
+                View.position = this.$carStore.getCoords;
+                this.map = L.map('map').setView(View.position, View.zoom);
+                console.log(this.coords)
+                this.marker = L.marker(this.coords).addTo(this.map);
+
+                if (!this.$carStore.isParked) {
+                    this.marker.dragging.enable();
+                }
+
+                this.marker.on('dragend', function (e) {
+                    const newCoords = e.target.getLatLng()
+                    console.log(carStore)
+                    carStore.coords = { lat: newCoords.lat, lng: newCoords.lng };
+                })
+            }
+        }
+
 
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 20,
@@ -68,13 +94,37 @@ export default {
         }
     },
     methods: {
+        showCar() {
+            if (map) {
+                const View = {
+                    position: this.$carStore.getCoords,
+                    zoom: 15
+                }
+                this.map.setView(View.position, View.zoom)
+            }
+        },
+        showCarById(userId) {
+            let watchedUser;
+            for (const user of this.$carStore.userslist) {
+                if (user._id === userId) {
+                    watchedUser = user
+                }
+            }
 
+            if (watchedUser) {
+                const newcoords = { lat: watchedUser.voiture.latitude, lng: watchedUser.voiture.longitude }
+                this.map.setView(newcoords)
+            }
+
+        },
+        mountCars() {
+            console.log("hello")
+        }
     },
     computed: {
         isParked() {
             this.$carStore = useCarStore()
             if (this.$carStore) {
-                console.log(this.$carStore.isParked)
                 return this.$carStore.isParked
             }
             else {
@@ -99,6 +149,6 @@ export default {
 </script>
 
 <template>
-    <div id="map" class=" h-[320px] z-[1] rounded-t-lg">
+    <div id="map" class=" h-[480px] z-[1] rounded-t-lg">
     </div>
 </template>

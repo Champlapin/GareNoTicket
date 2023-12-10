@@ -26,19 +26,50 @@ exports.effectuerPaiement = async (req, res, next) => {
 	const userId = req.user.userId;
 	try {
 		//TODO : Coder le paiement.
-		
-
-
-		let a = 0;
-
-
+		if (!userId) {
+			res.status(400).json({ message: "L'utilisateur n'existe pas" });
+		}
+		let histos = await Histo.find({ userId, isPaid: false });
+		const facture = await Facture.findByIdAndUpdate(
+			userId,
+			{ price: 0 },
+			{ new: true }
+		);
+		if (histos.length <= 0) {
+			res.status(200).json({ message: "Aucune facture à payer" });
+		}
+		for (const histo of histos) {
+			histo.isPaid = true;
+			await histo.save();
+		}
+		res.status(200).json({ histos, facture });
 	} catch (error) {
 		next(error);
 	}
 };
 
 exports.getFacture = async (req, res, next) => {
-	//TODO : Coder la fonction
-
 	const userId = req.user.userId;
+	let somme = 0;
+	try {
+		if (!userId) {
+			res.status(400).json({ message: "L'utilisateur n'existe pas" });
+		}
+
+		const histos = await Histo.find({ userId });
+
+		for (const histo of histos) {
+			somme += histo.price;
+		}
+
+		const facture = await Facture.findByIdAndUpdate(
+			userId,
+			{ price: somme },
+			{ new: true }
+		);
+
+		res.status(200).json(facture);
+	} catch (err) {
+		next(err);
+	}
 };
