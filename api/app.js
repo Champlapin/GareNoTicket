@@ -35,7 +35,7 @@ app.use((req, res, next) => {
 
 app.use("/auth", authRoutes);
 app.use(cors(), userRoutes);
-app.use("/hist", historiqueRoutes);
+app.use(cors(), historiqueRoutes);
 app.use("db", dbRoutes);
 // Utilisation des routes en tant que middleware
 

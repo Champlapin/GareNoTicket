@@ -80,10 +80,16 @@ router.beforeEach((to, from, next) => {
     } else {
       const decoded = jwtDecode(token)
       $userStore.user = decoded.user
-      $carStore.currentCar = decoded.voiture
-      $carStore.coords = decoded.voiture
-        ? { lat: decoded.voiture.latitude, lng: decoded.voiture.longitude }
-        : null
+
+      if (router.currentRoute.name !== 'valet' && router.currentRoute.name !== 'deplacement') {
+        $carStore.currentCar = decoded.voiture
+      }
+
+      if (decoded.voiture) {
+        $carStore.coords = { lat: decoded.voiture.latitude, lng: decoded.voiture.longitude }
+      } else {
+        $carStore.coords = null
+      }
 
       if (decoded.user.isValet) {
         $carStore.setUsers()

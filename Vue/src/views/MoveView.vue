@@ -14,11 +14,15 @@ import { useToast } from 'vue-toast-notification';
 
 export default {
   data() {
-    userinfo: null
+    return {
+      userinfo: null,
+      userId: null,
+      valet: null
+    }
   },
   created() {
     this.$userStore = useAuthStore();
-    this.user = this.$userStore.user
+    this.valet = this.$userStore.user
 
     this.$carStore = useCarStore();
     this.car = this.$carStore.currentCar
@@ -26,10 +30,39 @@ export default {
     this.$toast = useToast()
   },
   mounted() {
-
+    this.userId = this.$route.params.userId
+    console.log(this.userId)
+    this.$carStore.setCar(this.userId).then(() => {
+      this.MoveCar(true)
+    })
+  },
+  unmounted() {
+    this.$carStore.setMoveToFalse(this.userId)
   },
   methods: {
+    setViewToCar() {
+      this.$refs.map.showCar()
+    },
+    async MoveCar(isMoving) {
+      const res = await this.$carStore.setParking(this.userId, isMoving, true)
 
+      let action = isMoving ? "récuperé" : "garé";
+      let successMessage = `La voiture a été ${action}.`;
+      let errorMessage = "Une érreur s'est produite lors de la requête.";
+
+      if (res.status == 200) {
+        if (!isMoving) {
+          this.$toast.info(successMessage, { position: 'top-right', duration: 5000, showProgressBar: true });
+          console.log(this.$route.userId)
+          this.$carStore.Facturer(this.valet.price, this.userId)
+          this.$emit('update-data', 'Vue');
+          this.$router.push({ name: 'valet' })
+        }
+      }
+      else {
+        this.$toast.error(errorMessage, { position: 'top-right', duration: 5000, showProgressBar: true });
+      }
+    },
   }
 }
 
@@ -42,36 +75,22 @@ export default {
   <div>
     <div class="my-auto">
       <div class=" container mx-auto h-full">
-        <div
-          class=" border-text border rounded-lg lg:w-6/12 md:w-8/12 sm:w-10/12 w-11/12 mx-auto border-opacity-20 shadow-sm">
+        <div class="  border-text border rounded-lg w-9/12 mx-auto border-opacity-40 shadow-special shadow-md">
           <MapComponent ref="map" />
-          <div v-if="$carStore.getCar" class="py-4 flex justify-center">
-            <button type="button" :disabled="$carStore.isParked"
-              :class="[!this.$carStore.isParked ? 'btn-active' : 'btn-inactive']">
+          <div class="py-4 flex justify-center">
+            <button @click="MoveCar(false)" type="button" :disabled="!$carStore.isMoving"
+              :class="[this.$carStore.isMoving ? 'btn-active' : 'btn-inactive']">
               Garer
               <span class="text-bold fill-inherit">
                 <ParkingIcon class=" fill-inherit" />
               </span>
             </button>
-            <button type="button" :disabled="!$carStore.isParked"
-              :class="[this.$carStore.isParked ? 'btn-active' : 'btn-inactive']" class="">
-              Déplacer
-              <span class="text-bold ">
-                <CarGoIcon class=" fill-inherit" />
-              </span>
-            </button>
+
             <button @click="setViewToCar" type="button" class="">
               <locationIcon class="icon" />
             </button>
           </div>
-          <div v-else class="text-center my-3">
-            <p class="">Il semblerait que vous n'ayez pas de véhicule.</p>
-            <p>
-              <RouterLink class="border-b hover:text-accent hover:border-accent transition-all font-bold m-0 border-text "
-                :to="{ name: 'profile' }">Ajouter in véhicule</RouterLink> à
-              votre profile pour commencer.
-            </p>
-          </div>
+
         </div>
       </div>
     </div>

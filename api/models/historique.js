@@ -7,7 +7,7 @@ const historiqueSchema = new Schema(
 	{
 		price: {
 			type: Number,
-			default: 0,
+			required: [true, "prix est requis"],
 			validate: {
 				validator: function (v) {
 					return v > 0;

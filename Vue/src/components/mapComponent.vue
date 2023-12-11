@@ -31,6 +31,7 @@ export default {
     },
     async mounted() {
         let carStore = this.$carStore
+        this.map = L.map('map');
 
         let View = {
             position: [46.7922, -71.2639],
@@ -38,32 +39,62 @@ export default {
             //Default map position set to the school.
         }
 
-        if (this.$userStore.isValet) {
-            const userslist = this.$carStore.userslist
-            this.map = L.map('map').setView(View.position, View.zoom);
+        if (this.$route.name === 'valet') {
+            this.$carStore.setUsers().then(() => {
+                const userslist = this.$carStore.userslist
+                console.log(this.$carStore.userslist)
 
-            console.log(userslist)
-            if (userslist) {
+                console.log(userslist)
+                if (userslist) {
 
-                if (userslist.length > 0) {
-                    const firstCar = userslist[0]
-                    View.position = { lat: firstCar.latitude, lng: firstCar.longitude }
+                    if (userslist.length > 0) {
+                        const firstCar = userslist[0].voiture
+                        View.position = { lat: firstCar.latitude, lng: firstCar.longitude }
+                        this.map.setView(View.position, View.zoom);
 
-                    for (const user of userslist) {
-                        L.marker({ lat: user.voiture.latitude, lng: user.voiture.longitude }).addTo(this.map);
+                        for (const user of userslist) {
+                            L.marker({ lat: user.voiture.latitude, lng: user.voiture.longitude }).addTo(this.map);
+                        }
                     }
                 }
-            }
 
+                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 20,
+                    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                    accessToken: 'pk.eyJ1IjoiY2hhbXByZW1peDQiLCJhIjoiY2pkcWlnYmV4MXo0MzMzbDdtdnMyOWdjMSJ9.rPqi3578_IEmJ7qdD46iDw'
+                }).addTo(this.map);
+            })
+        }
+        else if (this.$route.name === 'deplacement') {
+
+            const userId = this.$route.params.userId
+            console.log(userId)
+            this.$carStore.setCar(userId).then(() => {
+
+                this.coords = !this.coords ? this.$carStore.getCoords : this.coords;
+                this.map.setView(this.coords, View.zoom)
+                this.marker = L.marker(this.coords).addTo(this.map);
+
+
+                this.marker.dragging.enable();
+
+
+                this.marker.on('dragend', function (e) {
+                    const newCoords = e.target.getLatLng()
+                    console.log(newCoords)
+                    carStore.coords = { lat: newCoords.lat, lng: newCoords.lng };
+                })
+
+            })
         }
         else {
 
             if (!this.$carStore.getCar) {
-                this.map = L.map('map').setView(View.position, View.zoom);
+                this.map.setView(View.position, View.zoom);
             }
             else {
                 View.position = this.$carStore.getCoords;
-                this.map = L.map('map').setView(View.position, View.zoom);
+                this.map.setView(View.position, View.zoom);
                 console.log(this.coords)
                 this.marker = L.marker(this.coords).addTo(this.map);
 
@@ -86,12 +117,9 @@ export default {
             accessToken: 'pk.eyJ1IjoiY2hhbXByZW1peDQiLCJhIjoiY2pkcWlnYmV4MXo0MzMzbDdtdnMyOWdjMSJ9.rPqi3578_IEmJ7qdD46iDw'
         }).addTo(this.map);
 
-        if (this.$route.name == "home") {
+    },
+    updated() {
 
-            if (this.$carStore.isParked) {
-                console.log("car is parked")
-            }
-        }
     },
     methods: {
         showCar() {
@@ -131,15 +159,42 @@ export default {
                 return null
             }
         },
+        isMoving() {
+            this.$carStore = useCarStore()
+            if (this.$carStore) {
+                return this.$carStore.isMoving
+            }
+            else {
+                return null
+            }
+        }
 
     },
     watch: {
         isParked(newVal, oldVal) {
-            if (newVal) {
-                this.marker.dragging.disable()
+            if (this.$route.name == 'home') {
+
+                if (this.marker) {
+                    if (newVal) {
+                        this.marker.dragging.disable()
+                    }
+                    else {
+                        this.marker.dragging.enable()
+                    }
+                }
             }
-            else {
-                this.marker.dragging.enable()
+        },
+        isMoving(newVal, oldval) {
+            if (this.$route.name == 'deplacement') {
+
+                if (this.marker) {
+                    if (!newVal) {
+                        this.marker.dragging.disable()
+                    }
+                    else {
+                        this.marker.dragging.enable()
+                    }
+                }
             }
         }
     }

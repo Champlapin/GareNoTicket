@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const config = require("../config");
 const User = require("../models/user");
+const Facture = require('../models/facture');
 const saltRounds = 10;
 
 exports.login = async (req, res, next) => {
@@ -44,6 +45,7 @@ exports.login = async (req, res, next) => {
 					email: user.email,
 					id: user.id,
 					isValet: user.isValet,
+					price : user.price
 				},
 				voiture: user.voiture,
 			},
@@ -65,13 +67,7 @@ exports.signup = async (req, res, next) => {
 		//TODO : Will need to change this validation.
 		let message = "Les érreurs suivantes sont présentes";
 
-		if (!email) {
-			message += "\r le champ email est invalide";
-		}
-		if (!username) {
-			message += "\r le username est invalide";
-		}
-		if (!password) {
+		if (!password || password.length < 6) {
 			message += "\r le mot de passe est invalide ";
 		}
 
@@ -105,7 +101,9 @@ exports.signup = async (req, res, next) => {
 			password: hashed,
 		});
 		console.log(user);
-		user.save();
+		await user.save();
+		
+
 		res.status(200).json(user);
 	} catch (err) {
 		console.log(username + " cause problème");

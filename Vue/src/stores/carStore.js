@@ -15,6 +15,9 @@ export const useCarStore = defineStore({
     isParked: (state) => {
       return state.currentCar ? state.currentCar.isParked : false
     },
+    isMoving: (state) => {
+      return state.currentCar ? state.currentCar.isMoving : false
+    },
     getCoords: (state) => {
       return state.currentCar
         ? { lat: state.currentCar.latitude, lng: state.currentCar.longitude }
@@ -65,7 +68,6 @@ export const useCarStore = defineStore({
       const hour = today.getHours()
       let newHour = today.getHours()
 
-      console.log(today)
       if (today.getDay() >= 1 && today.getDay() < 6) {
         if (today.getHours() < 12) {
           newHour = hour < 11 && hour > 9 ? hour + 1 : 13
@@ -96,22 +98,41 @@ export const useCarStore = defineStore({
       console.log(newTime)
       return newTime
     },
-    async setParking(userId, isParked) {
+    async setParking(userId, parkOrMove, isMove = false) {
       const URL = `http://localhost:3000/car/${userId}`
-      let timeToLeave = new Date()
+      let timeToLeave = this.calculerHeure()
       let body
+      const userStore = useAuthStore()
+      const valet = userStore.user
+      console.log(isMove)
 
-      if (isParked) {
-        timeToLeave = this.calculerHeure()
-        body = {
-          isParked: isParked,
-          timeToLeave: timeToLeave,
-          longitude: this.coords.lng,
-          latitude: this.coords.lat
+      if (isMove) {
+        if (!parkOrMove) {
+          body = {
+            isMoving: parkOrMove,
+            timeToLeave: timeToLeave,
+            longitude: this.coords.lng,
+            latitude: this.coords.lat,
+            valet: valet.id
+          }
+        } else {
+          body = {
+            isMoving: parkOrMove,
+            valet: null
+          }
         }
         console.log(body)
       } else {
-        body = { isParked: isParked }
+        if (parkOrMove) {
+          body = {
+            isParked: parkOrMove,
+            timeToLeave: timeToLeave,
+            longitude: this.coords.lng,
+            latitude: this.coords.lat
+          }
+        } else {
+          body = { isParked: parkOrMove }
+        }
       }
 
       const res = await fetch(URL, {
@@ -124,15 +145,47 @@ export const useCarStore = defineStore({
       })
 
       let token = await res.json()
-      console.log(res.status)
       if (res.status == 200) {
+        if (!isMove) {
+          localStorage.setItem('jwt', token)
+        }
         const decoded = jwtDecode(token)
-        localStorage.setItem('jwt', token)
-
         this.currentCar = decoded.voiture
       }
       return { status: res.status, message: token }
     },
+
+    async Facturer(price, idUser) {
+      console.log('hello this is your bill $' + price)
+      const $userStore = useAuthStore()
+      const valet = $userStore.user
+      const URL = `http://localhost:3000/facturer`
+
+      await fetch(URL, {
+        method: 'POST',
+        body: JSON.stringify({ price, idUser, idValet: valet.id }),
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8',
+          'Access-Control-Allow-Origin': '*',
+          Authorization: localStorage.getItem('jwt')
+        }
+      })
+      this.currentCar.isMoving = false
+    },
+    async setMoveToFalse(userId) {
+      const URL = `http://localhost:3000/car/${userId}`
+
+      await fetch(URL, {
+        method: 'PUT',
+        body: JSON.stringify({ isMoving: false }),
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8',
+          'Access-Control-Allow-Origin': '*'
+        }
+      })
+      this.currentCar.isMoving = false
+    },
+
     async setUsers() {
       const URL = `http://localhost:3000/users/`
 
@@ -140,6 +193,16 @@ export const useCarStore = defineStore({
       let response = await res.json()
 
       this.userslist = response.users
+    },
+    async setCar(userId) {
+      const URL = `http://localhost:3000/user/${userId}`
+
+      const res = await fetch(URL)
+      let response = await res.json()
+      //TODO : Ajouter un meiileur indacteur de validité.
+      if (response.username) {
+        this.currentCar = response.voiture
+      }
     }
   }
 })

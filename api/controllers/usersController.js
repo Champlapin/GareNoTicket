@@ -3,6 +3,7 @@
 const User = require("../models/user");
 const Voiture = require("../models/voiture");
 const Histo = require("../models/historique");
+const Facture = require("../models/facture");
 const config = require("../config");
 const user = require("../models/user");
 const jwt = require("jsonwebtoken");
@@ -14,7 +15,9 @@ const url_base = config.URL + ":" + config.PORT;
  * @returns l'utilisateur
  */
 async function checkUserExists(userId) {
-	const user = await User.findById(userId).populate("voiture");
+	const user = await User.findById(userId)
+		.select("email username _id")
+		.populate("voiture");
 	if (!user) {
 		const error = new Error("L'utilisateur n'existe pas.");
 		error.statusCode = 404;
@@ -53,9 +56,7 @@ exports.getUser = async (req, res, next) => {
 	try {
 		const userId = req.user.userId;
 		const user = await checkUserExists(userId);
-		res.status(200).json({
-			user: user,
-		});
+		res.status(200).json(user);
 	} catch (err) {
 		next(err);
 	}
@@ -64,12 +65,10 @@ exports.getUser = async (req, res, next) => {
 // eslint-disable-next-line no-undef
 exports.getUserBySession = async (req, res, next) => {
 	try {
-		const userId = req.params.id;
+		const userId = req.user.id;
 		console.log(userId);
 		const user = await checkUserExists(userId);
-		res.status(200).json({
-			user: user,
-		});
+		res.status(200).json(user);
 	} catch (err) {
 		next(err);
 	}
@@ -79,11 +78,8 @@ exports.getUserBySession = async (req, res, next) => {
 exports.getUserById = async (req, res, next) => {
 	try {
 		const userId = req.params.id;
-		console.log(userId);
 		const user = await checkUserExists(userId);
-		res.status(200).json({
-			user: user,
-		});
+		res.status(200).json(user);
 	} catch (err) {
 		next(err);
 	}
@@ -111,6 +107,7 @@ exports.updateUser = async (req, res, next) => {
 					email: newUser.email,
 					id: newUser.id,
 					isValet: newUser.isValet,
+					price: user.price,
 				},
 				voiture: newUser.voiture,
 			},
