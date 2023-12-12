@@ -39,8 +39,10 @@ app.use(cors(), historiqueRoutes);
 app.use("/db", dbRoutes);
 // Utilisation des routes en tant que middleware
 
+console.log(process.env.DATA_BASE)
+
 mongoose
-	.connect(MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true })
+	.connect(process.env.DATA_BASE, { useNewUrlParser: true, useUnifiedTopology: true })
 	.then(() => {
 		app.listen(PORT, () => {
 			console.log("Node.js est à l'écoute sur le port %s ", PORT);
