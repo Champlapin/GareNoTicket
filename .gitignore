@@ -126,3 +126,4 @@ dist
 .yarn/install-state.gz
 .pnp.*
 420-15D-FX TP3 A23.pdf
+/Api/seeds/jsons

@@ -1,7 +1,10 @@
 <script setup>
 
 import LowerNav from '../components/LowerNav.vue';
-import { useAuthStore } from '../stores/userStore'
+import { useAuthStore } from '../stores/userStore';
+import PayementIcon from '../components/icons/PayementIcon.vue'
+import { useToast } from 'vue-toast-notification';
+
 </script>
 
 <script>
@@ -14,32 +17,82 @@ export default {
     }
 
   },
-  created() {
+  async created() {
+    this.$userStore = useAuthStore()
+    this.$toast = useToast()
+    this.$userStore.getFacture().then((res) => {
+      if (res) {
+        console.log(res)
+        this.factures = res
+      }
+    })
+    this.$userStore.getHistos().then((res) => {
+      if (res) {
+        console.log(res)
+        this.histos = res
+      }
+    })
+
+  },
+  mounted() {
 
   },
   methods: {
-
+    hasFacture() {
+      return this.factures ? this.factures.length > 0 : false;
+    },
+    hasHistos() {
+      return this.histos ? this.histos.length > 0 : false;
+    },
+    formatDate(date) {
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')} h ${String(date.getMinutes()).padStart(2, '0')} min `;
+    },
+    Payer() {
+      this.$userStore.payerFacture().then((res) => {
+        console.log(res)
+        if (res.factures) {
+          this.$toast.success("Transaction terminé", { position: 'top-right', duration: 5000, showProgressBar: true });
+          this.factures = res.factures
+          this.histos = res.histos
+        }
+        else {
+          this.$toast.error("Une érreur s'est produite lors du paiement ", { position: 'top-right', duration: 5000, showProgressBar: true });
+        }
+      })
+    },
+    getSolde() {
+      let somme = 0
+      if (this.histos) {
+        for (const histo of this.histos) {
+          somme += !histo.isPaid ? histo.price : 0;
+        }
+      }
+      return somme
+    }
   }
 }
 
 </script>
-
 
 <template>
   <div class=" mx-auto my-4">
     <div
       class=" lg:w-5/12 md:w-6/12 w-10/12 my-8 mx-auto border shadow-md border-opacity-20 border-text shadow-text rounded-sm">
       <LowerNav />
-      <div class=" flex justify-around my-4">
+      <div
+        class=" flex justify-around py-3 border-b border-text border-opacity-40 shadow-sm bg-opacity-10 bg-text shadow-text">
         <div class="flex my-auto">
-          <p>Solde à payer: <span class="font-bold px-3">10 $</span></p>
+          <p>Solde à payer: <span class="font-bold px-3">{{ getSolde() }} $</span></p>
         </div>
-        <button class="border-text border p-2 rounded-md">PAYER MAINTENANT</button>
+        <button @click="Payer()" :disabled="getSolde() <= 0"
+          :class="[getSolde() > 0 ? 'btn-payer-active' : 'btn-payer-inactive']">PAYER
+          <PayementIcon class="mx-1 fill-inherit" />
+        </button>
       </div>
       <div class="w-10/12 mx-auto">
         <div class="my-4">
           <p>Historique de factures</p>
-          <div class="shadow-md shadow-text rounded-md border-text border border-opacity-20">
+          <div v-if="hasFacture()" class="shadow-md shadow-text rounded-md border-text border border-opacity-20">
             <div class="flex py-3 border-text border-b border-opacity-20">
               <div class="w-9/12 ms-3">
                 <p>Date</p>
@@ -49,37 +102,26 @@ export default {
               </div>
             </div>
             <div>
-              <div class="flex py-3 border-text border-b border-opacity-20">
+            </div>
+            <div>
+              <div v-for="facture in factures" :key="facture.id" class="flex py-3 border-text border-b border-opacity-20">
                 <div class="w-9/12 ms-3">
-                  <p>2023-11-03 16 h 27 min 48 sec</p>
+                  <p>{{ formatDate(new Date(facture.createdAt)) }}</p>
                 </div>
                 <div>
-                  <p class="w-3/12 ">24$</p>
+                  <p class="w-3/12 ">{{ facture.price }}$</p>
                 </div>
               </div>
-              <div class="flex py-3 border-text border-b border-opacity-20">
-                <div class="w-9/12 ms-1">
-                  <p>2023-11-15 13 h 42 min 17 sec</p>
-                </div>
-                <div>
-                  <p class="w-3/12">24$</p>
-                </div>
-              </div>
+
             </div>
-            <div class="flex py-3">
-              <div class="w-9/12 ms-1">
-                <p>2023-12-03 15 h 00 min 04 sec</p>
-              </div>
-              <div>
-                <p class="w-3/12">24$</p>
-              </div>
-            </div>
+
           </div>
+          <div v-else class="text-opacity-70 text-text text-center">Vous n'avez aucune facture</div>
         </div>
 
         <div class="my-4">
           <p>Historique des déplacements</p>
-          <div class="shadow-md shadow-text rounded-md border-opacity-20 border-text border">
+          <div v-if="hasHistos()" class="shadow-md shadow-text rounded-md border-opacity-20 border-text border">
             <div class="flex py-3 border-text border-b border-opacity-20 ">
               <div class="w-8/12 ms-1">
                 <p>Date</p>
@@ -91,31 +133,23 @@ export default {
                 <p>Payé</p>
               </div>
             </div>
-            <div class="flex py-3 border-text border-b border-opacity-20">
-              <div class="w-8/12 ms-1">
-                <p>2023-10-05 09 h 12 min 48 sec</p>
-              </div>
-              <div class="w-2/12 mx-1">
-                <p>3$</p>
-              </div>
-              <div class="w-2/12 mx-1">
-                <p>Non</p>
-              </div>
-            </div>
-            <div class="flex py-3 border-text border-b border-opacity-20">
-              <div class="w-8/12 ms-1">
-                <p>2023-11-11 17 h 32 min 25 sec</p>
-              </div>
-              <div class="w-2/12 mx-1">
-                <p>3$</p>
-              </div>
-              <div class="w-2/12 mx-1">
-                <p>Oui</p>
+            <div v-for="histo in histos" :key="histo.id">
+              <div class="flex py-3 border-text border-b border-opacity-20">
+                <div class="w-8/12 ms-1">
+                  <p>{{ formatDate(new Date(histo.createdAt)) }}</p>
+                </div>
+                <div class="w-2/12 mx-1">
+                  <p>{{ histo.price }}$</p>
+                </div>
+                <div class="w-2/12 mx-1">
+                  <p class="transition-all" :class="{ 'text-special': histo.isPaid }">{{ histo.isPaid ? "Oui" : "Non" }}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
+          <div v-else class="text-opacity-70 text-text text-center">Vous n'avez aucun historique de déplacements</div>
         </div>
       </div>
-    </div>
   </div>
-</template>
+</div></template>

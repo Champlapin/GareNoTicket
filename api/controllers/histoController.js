@@ -2,28 +2,23 @@
 
 const Histo = require("../models/historique");
 const Facture = require("../models/facture");
+const facture = require("../models/facture");
+const historique = require("../models/historique");
 
 exports.getHistorique = async (req, res, next) => {
-	const userId = req.user.userId;
+	const userId = req.user.id;
 	console.log("userId", userId);
 	try {
-		const histo = await Histo.find({ userId: userId }).sort({ createdAt: -1 });
-		if (!histo) {
-			const error = new Error("Aucun historique trouvé.");
-			error.statusCode = 404;
-			throw error;
-		}
+		const histos = await Histo.find({ userId: userId }).sort({ createdAt: -1 });
 
-		res.status(200).json({
-			histo: histo,
-		});
+		res.status(200).json(histos);
 	} catch (err) {
 		next(err);
 	}
 };
 
 exports.effectuerPaiement = async (req, res, next) => {
-	const userId = req.user.userId;
+	const userId = req.user.id;
 	let somme = 0;
 	try {
 		//TODO : Coder le paiement.
@@ -33,42 +28,32 @@ exports.effectuerPaiement = async (req, res, next) => {
 		let histos = await Histo.find({ userId, isPaid: false });
 		if (histos.length <= 0) {
 			res.status(200).json({ message: "Aucune facture à payer" });
+		} else {
+			for (const histo of histos) {
+				somme += histo.price;
+				histo.isPaid = true;
+				await histo.save();
+			}
+			let factures = new Facture({ userId: userId, price: somme });
+			await factures.save();
+			factures = await Facture.find({ userId });
+			histos = await Histo.find({ userId });
+			res.status(200).json({ factures, histos });
 		}
-		for (const histo of histos) {
-			somme += histo.price;
-			histo.isPaid = true;
-			await histo.save();
-		}
-		const facture = new Facture({ userId: userId, price: somme });
-		await facture.save();
-
-		res.status(200).json(facture);
 	} catch (error) {
 		next(error);
 	}
 };
 
 exports.getFacture = async (req, res, next) => {
-	const userId = req.user.userId;
+	const userId = req.user.id;
 	let somme = 0;
 	try {
 		if (!userId) {
 			res.status(400).json({ message: "L'utilisateur n'existe pas" });
 		}
-
-		const histos = await Histo.find({ userId });
-
-		for (const histo of histos) {
-			somme += histo.price;
-		}
-
-		const facture = await Facture.findByIdAndUpdate(
-			userId,
-			{ price: somme },
-			{ new: true }
-		);
-
-		res.status(200).json(facture);
+		const factures = await Facture.find({ userId });
+		res.status(200).json(factures);
 	} catch (err) {
 		next(err);
 	}

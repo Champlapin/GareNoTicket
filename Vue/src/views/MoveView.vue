@@ -32,11 +32,12 @@ export default {
   mounted() {
     this.userId = this.$route.params.userId
     console.log(this.userId)
-    this.$carStore.setCar(this.userId).then(() => {
-      this.MoveCar(true)
+    this.MoveCar(true).then(() => {
+      this.$carStore.setCar(this.userId)
     })
   },
   unmounted() {
+    console.log('nope')
     this.$carStore.setMoveToFalse(this.userId)
   },
   methods: {

@@ -64,6 +64,17 @@ const router = createRouter({
       meta: {
         requiresAuth: true
       }
+    },
+    {
+      path: '/logout',
+      name: 'logout',
+      beforeEnter: (to, from, next) => {
+        // log out the user
+        const $userStore = useAuthStore()
+        $userStore.LogoutUser()
+        // redirect to login page
+        next({ name: 'login' })
+      }
     }
   ]
 })
@@ -77,6 +88,8 @@ router.beforeEach((to, from, next) => {
     const token = localStorage.getItem('jwt')
     if (!token) {
       next({ name: 'login' })
+      $userStore.user = null
+      $carStore.currentCar = null
     } else {
       const decoded = jwtDecode(token)
       $userStore.user = decoded.user

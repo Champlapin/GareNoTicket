@@ -7,15 +7,15 @@ const voitureSchema = new Schema(
 	{
 		marque: {
 			type: String,
-			match: [/^.[a-zA-z\s]{1,50}$/],
+			match: [/^.{1,50}$/],
 		},
 		modele: {
 			type: String,
-			match: [/^.[a-zA-z\s]{0,50}$/],
+			match: [/^.{0,50}$/],
 		},
 		couleur: {
 			type: String,
-			match: [/^.[a-zA-z\s]{3,50}$/],
+			match: [/^.{3,50}$/],
 		},
 		plaque: {
 			type: String,

@@ -16,7 +16,7 @@ export default {
    data() {
       return {
          selectedCar: null,
-         userslist: null,
+         userslist: {},
       }
    },
    created() {
@@ -84,11 +84,12 @@ export default {
    <div>
       <div class="my-4">
          <div class=" container mx-auto">
-            <div class=" border-text border rounded-lg w-9/12 mx-auto border-opacity-40 shadow-special shadow-md">
+            <div class=" border-text border rounded-lg w-9/12 mx-auto border-opacity-40 ">
                <mapComponent ref="map" />
                <div class="py-2 border-t ">
                   <p class="text-md w-11/12 mx-auto">Informations des voitures</p>
-                  <div class="border w-11/12 mx-auto rounded-lg border-text border-opacity-20 shadow-sm">
+                  <div v-if="userslist.length > 0"
+                     class=" whitespace-nowrap border w-11/12 mx-auto rounded-lg border-text border-opacity-20 shadow-sm">
                      <!--TODO : Ajouter un filtre pour le nombre maximum à afficher de voitures-->
                      <div class=" text-sm border-b border-text border-opacity-10 py-2 shadow-md text">
                         <div class="flex  text-text text-opacity-75 text-center">
@@ -111,8 +112,7 @@ export default {
                               <div class="w-2/12">{{ user.voiture.couleur }}</div>
                               <div class="w-2/12 ">{{ showTimeLeft(user.voiture.timeToLeave) }}</div>
                               <div class="w-1/12 flex justify-between">
-                                 <RouterLink @click.native="setCar(user.voiture)"
-                                    :to="{ params: { userId: user._id }, name: 'deplacement', }">
+                                 <RouterLink :to="{ params: { userId: user._id }, name: 'deplacement', }">
                                     <CarIcon class="icon mx-1" />
                                  </RouterLink>
                               </div>
@@ -120,6 +120,8 @@ export default {
                         </button>
                      </div>
                   </div>
+                  <div v-else class="text-center text-opacity-60 text-text"> Il semblerait que personne ne se soit parké
+                     pour le moment. </div>
                </div>
             </div>
          </div>

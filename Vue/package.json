@@ -16,6 +16,7 @@
     "jsonwebtoken": "^9.0.2",
     "jwt-decode": "^4.0.0",
     "leaflet": "^1.9.4",
+    "mongodb": "^6.3.0",
     "pinia": "^2.1.7",
     "vee-validate": "^4.11.8",
     "vue": "^3.3.4",

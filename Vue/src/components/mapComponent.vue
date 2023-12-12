@@ -42,20 +42,22 @@ export default {
         if (this.$route.name === 'valet') {
             this.$carStore.setUsers().then(() => {
                 const userslist = this.$carStore.userslist
-                console.log(this.$carStore.userslist)
 
                 console.log(userslist)
-                if (userslist) {
+                if (userslist.length) {
 
                     if (userslist.length > 0) {
-                        const firstCar = userslist[0].voiture
-                        View.position = { lat: firstCar.latitude, lng: firstCar.longitude }
+                        const shownCar = userslist[0].voiture
+                        View.position = { lat: shownCar.latitude, lng: shownCar.longitude }
                         this.map.setView(View.position, View.zoom);
 
                         for (const user of userslist) {
                             L.marker({ lat: user.voiture.latitude, lng: user.voiture.longitude }).addTo(this.map);
                         }
                     }
+                }
+                else {
+                    this.map.setView(View.position, View.zoom);
                 }
 
                 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -70,8 +72,9 @@ export default {
             const userId = this.$route.params.userId
             console.log(userId)
             this.$carStore.setCar(userId).then(() => {
+                console.log(this.$carStore.currentCar)
 
-                this.coords = !this.coords ? this.$carStore.getCoords : this.coords;
+                this.coords = this.$carStore.getCoords;
                 this.map.setView(this.coords, View.zoom)
                 this.marker = L.marker(this.coords).addTo(this.map);
 

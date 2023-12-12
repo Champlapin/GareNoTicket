@@ -1,58 +1,35 @@
 
 <script>
-import { useVuelidate } from '@vuelidate/core'
-import { required, helpers } from '@vuelidate/validators'
 import { useAuthStore } from '../stores/userStore'
 
 
 export default {
   data() {
     return {
-      v$: useVuelidate(),
       Email: '',
       password: '',
-      isDark: false,
+      invalid: false,
 
     }
   },
   created() {
-    this.$store = useAuthStore() // Le store est maintenant disponible dans le composant
+    this.$userStore = useAuthStore() // Le store est maintenant disponible dans le composant
   },
   methods: {
     async onSubmit() {
       // TODO: Ajouter la validation du côté BD
       //let valide = await this.v$.$validate()
-
-      try {
-        const response = await this.$store.login(this.Email, this.password)
+        const response = await this.$userStore.login(this.Email, this.password)
         if (response) {
           //TODO : rediriger vers Valet si on est valet.
           this.$router.push({ name: 'home' });
         }
-      } catch (err) {
-        console.log(err.message)
-        //TODO : remmettre les érreurs du côté bd sur le côté client.
-      }
-
-
+        else {
+          this.invalid = true
+        }
+      
     },
-    toggleDarkMode() {
-      this.isDark = this.isDark ? false : true;
-      console.log(this.isDark)
-    }
   },
-  validations() {
-
-    return {
-
-      Email: {
-        required: helpers.withMessage('Ce champ est obligatoire', required),
-      },
-      password: {
-        required: helpers.withMessage('Ce champ est obligatoire', required),
-      },
-    }
-  }
 }
 </script>
 
@@ -71,18 +48,15 @@ export default {
             <label class="" for="email">Email</label>
             <!--TODO : Changer l'ethétique des inputs pour ue le label soit dans le champs.-->
             <!--TODO : Demander quel messages afficher sur login.-->
-            <input class=" input-1 " @blur="v$.Email.$touch" placeholder="john@gmail.com" id="email" type="text"
+            <input class=" input-1 "  placeholder="john@gmail.com" id="email" type="text"
               v-model.trim="Email" />
-            <div class="text-sm text-text text-opacity-40" v-for="error of v$.password.$errors" :key="error.uid">
-
-            </div>
           </div>
           <div class="flex flex-col my-1">
             <label for="password">Mot de passe</label>
-            <input class="input-1" @blur="v$.password.$touch" id="password" type="password" v-model.trim="password" />
-            <div class="text-sm text-text text-opacity-40" v-for="error of v$.password.$errors" :key="error.uid">
-
-            </div>
+            <input class="input-1"  id="password" type="password" v-model.trim="password" />
+          </div>
+          <div v-if="invalid">
+            <p class="text-error text-center">Email ou mot de passe invalide</p>
           </div>
           <div class="py-1 my-2 mx-auto">
             <button type="submit"

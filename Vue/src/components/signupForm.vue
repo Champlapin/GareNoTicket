@@ -21,21 +21,25 @@ export default {
   methods: {
     async onSubmit() {
       //TODO : empêcher en cas de validation frontend invalide
-
-      const res = this.$userStore.signup(this.Email,this.username,this.password,this.confirmPassword)
-
-      if (res) {
-        this.$router.push({ name: 'login' });
+      this.v$.$touch()
+      console.log(this.v$)
+      console.log(this.v$.$errors.length == 0)
+      if (this.v$.$errors.length == 0) {
+        console.log('no')
+        this.$userStore.signup(this.Email, this.username, this.password, this.confirmPassword).then((res) => {
+          if (res.valide) {
+            this.$router.push({ name: 'login' });
+          }
+          else {
+            if (res.emailUnique) {
+              this.Email = ''
+              this.v$.$touch()
+              this.v$.$errors[0].$message = "L'addresse est déja utilisé par un autre utilisateur."
+            }
+          }
+        })
       }
-      else {
-        //TODO : Afficher les messages érreurs soit avec toasts ou les champs
-      }
-
     },
-    toggleDarkMode() {
-      this.isDark = this.isDark ? false : true;
-      console.log(this.isDark)
-    }
   },
   validations() {
     const min_name_len = 3;
@@ -78,35 +82,32 @@ export default {
     <form @submit.prevent="onSubmit">
       <div class="flex flex-col w-10/12  mx-auto ">
         <div class=" my-1 flex flex-col ">
-          <input @blur="v$.username.$touch"
-            class=" input-1"
-            placeholder="Nom d'utilisateur" aria-label="Username" type="text" v-model.trim="username" />
-          <div class="text-sm text-text text-opacity-40" v-for="error of v$.username.$errors" :key="error.uid">
+          <input @blur="v$.username.$touch" class=" input-1" placeholder="Nom d'utilisateur" aria-label="Username"
+            type="text" v-model.trim="username" />
+          <div class="text-sm text-error text-opacity-80" v-for="error of v$.username.$errors" :key="error.uid">
             {{ error.$message }}
           </div>
         </div>
         <div class=" my-1 flex flex-col ">
-          <input @blur="v$.Email.$touch"
-            class=" input-1 " placeholder="Email" aria-label="email" type="text" v-model="Email" />
+          <input @blur="v$.Email.$touch" class=" input-1 " placeholder="Email" aria-label="email" type="text"
+            v-model="Email" />
 
-          <div class="text-sm text-text text-opacity-40" v-for="error of v$.Email.$errors" :key="error.uid">
+          <div class="text-sm text-error text-opacity-80" v-for="error of v$.Email.$errors" :key="error.uid">
             {{ error.$message }}
           </div>
         </div>
         <div class=" my-1 flex flex-col">
-          <input @blur="v$.password.$touch"
-            class="input-1"
-            placeholder="Mot de passe" aria-label="Password" type="password" v-model.trim="password" />
-          <div class="text-sm text-text text-opacity-40" v-for="error of v$.password.$errors" :key="error.uid">
+          <input @blur="v$.password.$touch" class="input-1" placeholder="Mot de passe" aria-label="Password"
+            type="password" v-model.trim="password" />
+          <div class="text-sm text-error text-opacity-80" v-for="error of v$.password.$errors" :key="error.uid">
             {{ error.$message }}
           </div>
         </div>
         <div class=" my-1 flex flex-col">
-          <input @blur="v$.confirmPassword.$touch"
-            class=" input-1"
-            id="confirmPassword" type="password" placeholder="Confirmer le mot de passe" v-model.trim="confirmPassword
+          <input @blur="v$.confirmPassword.$touch" class=" input-1" id="confirmPassword" type="password"
+            placeholder="Confirmer le mot de passe" v-model.trim="confirmPassword
               " name="confirmPassword" />
-          <div class="text-sm text-text text-opacity-40" v-for="error of v$.confirmPassword.$errors" :key="error.uid">
+          <div class="text-sm text-error text-opacity-80" v-for="error of v$.confirmPassword.$errors" :key="error.uid">
             {{ error.$message }}
           </div>
         </div>

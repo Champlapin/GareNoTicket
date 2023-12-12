@@ -23,7 +23,9 @@ export const useCarStore = defineStore({
         ? { lat: state.currentCar.latitude, lng: state.currentCar.longitude }
         : null
     },
-    getTimeToleave: (state) => state.currentCar.timeToLeave,
+    getTimeToleave: (state) => {
+      state.currentCar ? state.currentCar.timeToLeave : null
+    },
     getUsers: (state) => state.userslist
   },
   mutations: {
@@ -35,6 +37,16 @@ export const useCarStore = defineStore({
     }
   },
   actions: {
+    setUserById(userId) {
+      if (this.userslist.length > 0) {
+        for (const user of this.userslist) {
+          if (user.id === userId) {
+            this.currentCar = user.voiture
+          }
+        }
+      }
+      return null
+    },
     async update(userId, voiture) {
       const URL = `http://localhost:3000/car/${userId}`
 
@@ -65,12 +77,16 @@ export const useCarStore = defineStore({
     calculerHeure() {
       let newTime = new Date()
       let today = new Date()
+
+      //today.setHours(16, 0)
+
       const hour = today.getHours()
+      console.log(hour)
       let newHour = today.getHours()
 
       if (today.getDay() >= 1 && today.getDay() < 6) {
         if (today.getHours() < 12) {
-          newHour = hour < 11 && hour > 9 ? hour + 1 : 13
+          newHour = hour < 11 && hour >= 9 ? hour + 1 : 14
           newHour = hour < 9 ? 10 : newHour
           newTime.setHours(newHour)
         } else {
@@ -82,7 +98,6 @@ export const useCarStore = defineStore({
           } else {
             newTime.setHours(10, 0)
             if (today.getDay() == 5) {
-              //FIXME : Vérifier si elle fonctionne.
               newTime.setDate(today.getDate() + ((1 + 7 - today.getDay()) % 7))
             } else {
               newTime.setDate(today.getDate() + 1)
@@ -90,8 +105,6 @@ export const useCarStore = defineStore({
           }
         }
       } else {
-        //
-
         newTime.setDate(today.getDate() + ((1 + 7 - today.getDay()) % 7))
         newTime.setHours(10, 0)
       }
@@ -113,12 +126,12 @@ export const useCarStore = defineStore({
             timeToLeave: timeToLeave,
             longitude: this.coords.lng,
             latitude: this.coords.lat,
-            valet: valet.id
+            valet: null
           }
         } else {
           body = {
             isMoving: parkOrMove,
-            valet: null
+            valet: valet.id
           }
         }
         console.log(body)
@@ -148,15 +161,18 @@ export const useCarStore = defineStore({
       if (res.status == 200) {
         if (!isMove) {
           localStorage.setItem('jwt', token)
+          const decoded = jwtDecode(token)
+          this.currentCar = decoded.voiture
+        } else {
+          const decoded = jwtDecode(token)
+          console.log(decoded)
+          
         }
-        const decoded = jwtDecode(token)
-        this.currentCar = decoded.voiture
       }
       return { status: res.status, message: token }
     },
 
     async Facturer(price, idUser) {
-      console.log('hello this is your bill $' + price)
       const $userStore = useAuthStore()
       const valet = $userStore.user
       const URL = `http://localhost:3000/facturer`
@@ -189,9 +205,14 @@ export const useCarStore = defineStore({
     async setUsers() {
       const URL = `http://localhost:3000/users/`
 
-      const res = await fetch(URL)
+      const res = await fetch(URL, {
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8',
+          'Access-Control-Allow-Origin': '*',
+          Authorization: localStorage.getItem('jwt')
+        }
+      })
       let response = await res.json()
-
       this.userslist = response.users
     },
     async setCar(userId) {

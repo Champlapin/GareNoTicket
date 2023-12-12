@@ -51,17 +51,18 @@ export const useAuthStore = defineStore({
         console.log('bad email')
       } else if (!res.password) {
         console.log('bad password')
-      }
-      const token = res.jwt
-      localStorage.setItem('jwt', token)
+      } else {
+        const token = res.jwt
+        localStorage.setItem('jwt', token)
 
-      const $carStore = useCarStore()
-      console.log(token)
-      const jwt = jwtDecode(token)
-      this.user = jwt.user
-      console.log(jwt)
-      $carStore.currentCar = jwt.user.voiture
-      return true
+        const $carStore = useCarStore()
+        console.log(token)
+        const jwt = jwtDecode(token)
+        this.user = jwt.user
+        console.log(jwt)
+        $carStore.currentCar = jwt.user.voiture
+        return { valide: true }
+      }
     },
     async signup(email, username, password, confirmPassword) {
       const signup_URL = 'http://localhost:3000/auth/signup'
@@ -77,12 +78,17 @@ export const useAuthStore = defineStore({
         headers: {
           'Content-type': 'application/json; charset=UTF-8'
         }
+      }).then((results) => {
+        return results.json()
       })
 
-      if (res.username) {
-        return true
+      if (res.emailUnique) {
+        return { emailUnique: res.emailUnique }
+      } else if (res.passwordMatch) {
+        return { passwordMatch: res.passwordMatch }
+      } else {
+        return { valide: true }
       }
-      return false
     },
     async update(user) {
       const updateUser_URL = `http://localhost:3000/user/${user.id}`
@@ -101,7 +107,7 @@ export const useAuthStore = defineStore({
       })
       if (res.status == 200) {
         const token = await res.json()
-        localStorage.setItem("jwt", token)
+        localStorage.setItem('jwt', token)
         const decoded = jwtDecode(token)
         const newUser = decoded.user
 
@@ -113,6 +119,69 @@ export const useAuthStore = defineStore({
         }
       }
       return res
+    },
+    async getFacture() {
+      const URL = `http://localhost:3000/facture`
+      let results = await fetch(URL, {
+        method: 'GET',
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8',
+          'Access-Control-Allow-Origin': '*',
+          Authorization: localStorage.getItem('jwt')
+        }
+      }).then((res) => {
+        if (res.status === 200) {
+          return res.json().then((factures) => {
+            return factures
+          })
+        } else {
+          return false
+        }
+      })
+
+      return results
+    },
+    async getHistos() {
+      const URL = `http://localhost:3000/historique`
+      let results = await fetch(URL, {
+        method: 'GET',
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8',
+          'Access-Control-Allow-Origin': '*',
+          Authorization: localStorage.getItem('jwt')
+        }
+      }).then((res) => {
+        if (res.status === 200) {
+          return res.json().then((histos) => {
+            return histos
+          })
+        } else {
+          return false
+        }
+      })
+
+      return results
+    },
+    async payerFacture() {
+      const URL = `http://localhost:3000/effectuerPaiement`
+      let factures = await fetch(URL, {
+        method: 'GET',
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8',
+          'Access-Control-Allow-Origin': '*',
+          Authorization: localStorage.getItem('jwt')
+        }
+      }).then((res) => {
+        return res.json()
+      })
+      //TODO : Retourner la nouvelle facture et les nouveaux histos
+      return factures
+    },
+    LogoutUser() {
+      localStorage.clear()
+      this.user = null
+      const $carStore = useCarStore()
+      $carStore.currentCar = null
     }
   }
 })

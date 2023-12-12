@@ -43,7 +43,7 @@ exports.getUsers = async (req, res, next) => {
 			throw error;
 		}
 
-		res.status(200).json({
+		return res.status(200).json({
 			users: filteredUsers,
 		});
 	} catch (err) {
@@ -56,7 +56,7 @@ exports.getUser = async (req, res, next) => {
 	try {
 		const userId = req.user.userId;
 		const user = await checkUserExists(userId);
-		res.status(200).json(user);
+		return res.status(200).json(user);
 	} catch (err) {
 		next(err);
 	}
@@ -68,7 +68,7 @@ exports.getUserBySession = async (req, res, next) => {
 		const userId = req.user.id;
 		console.log(userId);
 		const user = await checkUserExists(userId);
-		res.status(200).json(user);
+		return status(200).json(user);
 	} catch (err) {
 		next(err);
 	}
@@ -79,7 +79,7 @@ exports.getUserById = async (req, res, next) => {
 	try {
 		const userId = req.params.id;
 		const user = await checkUserExists(userId);
-		res.status(200).json(user);
+		return res.status(200).json(user);
 	} catch (err) {
 		next(err);
 	}
@@ -97,7 +97,7 @@ exports.updateUser = async (req, res, next) => {
 		}).populate("voiture");
 
 		if (!newUser) {
-			res.status(400).json({ message: "l'utilisateur n'existe pas" });
+			return res.status(400).json({ message: "l'utilisateur n'existe pas" });
 		}
 
 		const token = await jwt.sign(
@@ -116,7 +116,7 @@ exports.updateUser = async (req, res, next) => {
 			{ expiresIn: "4h" }
 		);
 
-		res.status(200).json(token);
+		return res.status(200).json(token);
 	} catch (error) {
 		next(error);
 	}
@@ -132,7 +132,7 @@ exports.updateCar = async (req, res, next) => {
 		let user = await User.findById(userId).populate("voiture");
 
 		if (!user) {
-			res.status(400).json({ message: "l'utilisateur n'existe pas." });
+			return res.status(400).json({ message: "l'utilisateur n'existe pas." });
 		}
 		//TODO : Valider les données entrants
 
@@ -162,7 +162,7 @@ exports.updateCar = async (req, res, next) => {
 			{ expiresIn: "4h" }
 		);
 
-		res.status(200).json(token);
+		return res.status(200).json(token);
 	} catch (error) {
 		next(error);
 	}
@@ -178,7 +178,7 @@ exports.deleteUser = async (req, res, next) => {
 			const voiture = await Voiture.findById(user.voiture);
 			await voiture.remove();
 		}
-		res.status(204).send();
+		return res.status(204).send();
 	} catch (err) {
 		next(err);
 	}

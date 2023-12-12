@@ -4,7 +4,7 @@ import { RouterLink } from 'vue-router'
 </script>
 
 <template>
-  <div class="bg-secondary py-2 mb-2 shadow-sm shadow-text border border-text border-opacity-20">
+  <div class="bg-secondary py-2 shadow-sm shadow-text border border-text border-opacity-20">
     <nav>
       <nav class="flex justify-around text-center">
         <RouterLink :to="{ name: 'profile' }" active-class=" bg-text text-secondary"

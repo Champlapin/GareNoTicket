@@ -24,37 +24,38 @@ exports.login = async (req, res, next) => {
 				message: "le champ password est vide.",
 			});
 		}
-
-		let user = await User.findOne({ email }).populate("voiture");
-		if (!user) {
-			res
-				.status(400)
-				.json({ email: false, message: "Aucun utilisateur avec ce email." });
-		}
-		let valide = await bcrypt.compare(password, user.password);
-		if (!valide) {
-			res
-				.status(400)
-				.json({ password: false, message: "Mot de passe est invalide" });
-		}
-
-		const token = await jwt.sign(
-			{
-				user: {
-					username: user.username,
-					email: user.email,
-					id: user.id,
-					isValet: user.isValet,
-					price : user.price
+		else {
+			let user = await User.findOne({ email }).populate("voiture");
+			if (!user) {
+				return res
+					.status(400)
+					.json({ email: false, message: "Aucun utilisateur avec ce email." });
+			}
+			let valide = await bcrypt.compare(password, user.password);
+			if (!valide) {
+				return res
+					.status(400)
+					.json({ password: false, message: "Mot de passe est invalide" });
+			}
+	
+			const token = await jwt.sign(
+				{
+					user: {
+						username: user.username,
+						email: user.email,
+						id: user.id,
+						isValet: user.isValet,
+						price : user.price
+					},
+					voiture: user.voiture,
 				},
-				voiture: user.voiture,
-			},
-			config.SECRET_JWT,
-			//TODO : changer la date d'expiration.
-			{ expiresIn: "4h" }
-		);
-
-		res.status(200).json({ jwt: token, email: true, password: true });
+				config.SECRET_JWT,
+				//TODO : changer la date d'expiration.
+				{ expiresIn: "4h" }
+			);
+	
+			return	res.status(200).json({ jwt: token, email: true, password: true });
+		}
 	} catch (err) {
 		next(err);
 	}
@@ -64,29 +65,17 @@ exports.signup = async (req, res, next) => {
 	const { email, username, password, confirmPassword } = req.body;
 
 	try {
-		//TODO : Will need to change this validation.
-		let message = "Les érreurs suivantes sont présentes";
 
-		if (!password || password.length < 6) {
-			message += "\r le mot de passe est invalide ";
-		}
-
-		if (!email || !username || !password || !confirmPassword) {
-			return res.status(400).json(message);
-		}
-
-		let existeDeja = await User.findOne({ email });
-
-		if (existeDeja) {
-			return res
-				.status(400)
-				.json({ message: "utilisateur avec cet email existe deja" });
-		}
-
-		//TODO : valider le username et le email.
-
+			let existeDeja = await User.findOne({ email });
+	
+			if (existeDeja) {
+				return res
+					.status(400)
+					.json({ emailUnique: "utilisateur avec cet email existe deja" });
+			}
+			
 		if (password !== confirmPassword) {
-			return res.status(400).json({ message: "The passwords do not match" });
+			return res.status(400).json({ passwordMatch: "The passwords do not match" });
 		}
 
 		//TODO : Hasher le mot de passe.
