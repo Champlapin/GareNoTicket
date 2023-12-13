@@ -155,6 +155,7 @@ exports.updateCar = async (req, res, next) => {
 					email: user.email,
 					id: user.id,
 					isValet: user.isValet,
+					price: user.price
 				},
 				voiture: user.voiture,
 			},
