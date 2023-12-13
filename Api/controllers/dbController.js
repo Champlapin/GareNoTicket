@@ -58,7 +58,7 @@ exports.seed = async (req, res, next) => {
 	}
 };
 exports.test = async (req, res, next) => {
-	const users = User.find();
+	const users = await User.find();
 
 	res.status(200).json(users);
 };
