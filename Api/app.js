@@ -34,11 +34,11 @@ app.use((req, res, next) => {
 });
 
 app.use("/auth", authRoutes);
-app.use(cors(), userRoutes);
-app.use(cors(), historiqueRoutes);
+app.use(userRoutes);
+app.use(historiqueRoutes);
 app.use("/db", dbRoutes);
 
-console.log(process.env.DATA_BASE)
+console.log(process.env.DATA_BASE);
 
 mongoose
 	.connect(process.env.DATA_BASE, { useNewUrlParser: true, useUnifiedTopology: true })
