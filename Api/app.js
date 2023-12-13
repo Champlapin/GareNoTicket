@@ -37,7 +37,6 @@ app.use("/auth", authRoutes);
 app.use(cors(), userRoutes);
 app.use(cors(), historiqueRoutes);
 app.use("/db", dbRoutes);
-// Utilisation des routes en tant que middleware
 
 console.log(process.env.DATA_BASE)
 
