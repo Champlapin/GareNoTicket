@@ -60,7 +60,7 @@ exports.seed = async (req, res, next) => {
 exports.test = async (req, res, next) => {
 	const users = await User.find();
 
-	res.status(200).json(users);
+	return res.status(200).json(users);
 };
 exports.ModifyData = async (req, res, next) => {
 	let users = await User.find({ isValet: false });
