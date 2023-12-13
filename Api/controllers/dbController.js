@@ -58,7 +58,7 @@ exports.seed = async (req, res, next) => {
 	}
 };
 exports.test = async (req,res,next) => {
-	res.status(200).json(process.env.DATA_BASE)
+	res.status(200).json(process.env.DATA_BASE);
 };
 exports.ModifyData = async (req, res, next) => {
 	let users = await User.find({ isValet: false });
