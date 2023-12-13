@@ -57,8 +57,10 @@ exports.seed = async (req, res, next) => {
 		next(err);
 	}
 };
-exports.test = async (req,res,next) => {
-	res.status(200).json("seems to work fine");
+exports.test = async (req, res, next) => {
+	const users = User.find();
+
+	res.status(200).json(users);
 };
 exports.ModifyData = async (req, res, next) => {
 	let users = await User.find({ isValet: false });
