@@ -34,14 +34,17 @@ app.use((req, res, next) => {
 });
 
 app.use("/auth", authRoutes);
-app.use(userRoutes);
-app.use(historiqueRoutes);
+app.use(cors(), userRoutes);
+app.use(cors(), historiqueRoutes);
 app.use("/db", dbRoutes);
 
 console.log(process.env.DATA_BASE);
 
 mongoose
-	.connect(process.env.DATA_BASE, { useNewUrlParser: true, useUnifiedTopology: true })
+	.connect(process.env.DATA_BASE, {
+		useNewUrlParser: true,
+		useUnifiedTopology: true,
+	})
 	.then(() => {
 		app.listen(PORT, () => {
 			console.log("Node.js est à l'écoute sur le port %s ", PORT);

@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { jwtDecode } from 'jwt-decode'
 import { useCarStore } from './carStore'
+import API_URL from '../config'
 
 export const useAuthStore = defineStore({
   id: 'AuthStore',
@@ -31,7 +32,8 @@ export const useAuthStore = defineStore({
   },
   actions: {
     async login(email, password) {
-      const login_URL = 'http://localhost:3000/auth/login'
+      const login_URL = `${API_URL}/auth/login`
+      console.log(login_URL)
 
       const res = await fetch(login_URL, {
         method: 'POST',
@@ -65,7 +67,7 @@ export const useAuthStore = defineStore({
       }
     },
     async signup(email, username, password, confirmPassword) {
-      const signup_URL = 'http://localhost:3000/auth/signup'
+      const signup_URL = `${API_URL}/auth/signup`
 
       const res = await fetch(signup_URL, {
         method: 'POST',
@@ -91,7 +93,7 @@ export const useAuthStore = defineStore({
       }
     },
     async update(user) {
-      const updateUser_URL = `http://localhost:3000/user/${user.id}`
+      const updateUser_URL = `${API_URL}/user/${user.id}`
       console.log('in the update')
       const res = await fetch(updateUser_URL, {
         method: 'PUT',
@@ -121,7 +123,7 @@ export const useAuthStore = defineStore({
       return res
     },
     async getFacture() {
-      const URL = `http://localhost:3000/facture`
+      const URL = `${API_URL}/facture`
       let results = await fetch(URL, {
         method: 'GET',
         headers: {
@@ -142,7 +144,7 @@ export const useAuthStore = defineStore({
       return results
     },
     async getHistos() {
-      const URL = `http://localhost:3000/historique`
+      const URL = `${API_URL}/historique`
       let results = await fetch(URL, {
         method: 'GET',
         headers: {
@@ -163,7 +165,7 @@ export const useAuthStore = defineStore({
       return results
     },
     async payerFacture() {
-      const URL = `http://localhost:3000/effectuerPaiement`
+      const URL = `${API_URL}/effectuerPaiement`
       let factures = await fetch(URL, {
         method: 'GET',
         headers: {

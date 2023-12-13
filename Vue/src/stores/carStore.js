@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { jwtDecode } from 'jwt-decode'
 import { url } from '@vuelidate/validators'
 import { useAuthStore } from './userStore'
-
+import API_URL from '../config'
 export const useCarStore = defineStore({
   id: 'CarStore',
   state: () => ({
@@ -48,7 +48,7 @@ export const useCarStore = defineStore({
       return null
     },
     async update(userId, voiture) {
-      const URL = `http://localhost:3000/car/${userId}`
+      const URL = `${API_URL}/car/${userId}`
 
       const res = await fetch(URL, {
         method: 'PUT',
@@ -112,7 +112,7 @@ export const useCarStore = defineStore({
       return newTime
     },
     async setParking(userId, parkOrMove, isMove = false) {
-      const URL = `http://localhost:3000/car/${userId}`
+      const URL = `${API_URL}/car/${userId}`
       let timeToLeave = this.calculerHeure()
       let body
       const userStore = useAuthStore()
@@ -166,7 +166,6 @@ export const useCarStore = defineStore({
         } else {
           const decoded = jwtDecode(token)
           console.log(decoded)
-          
         }
       }
       return { status: res.status, message: token }
@@ -175,7 +174,7 @@ export const useCarStore = defineStore({
     async Facturer(price, idUser) {
       const $userStore = useAuthStore()
       const valet = $userStore.user
-      const URL = `http://localhost:3000/facturer`
+      const URL = `${API_URL}/facturer`
 
       await fetch(URL, {
         method: 'POST',
@@ -189,7 +188,7 @@ export const useCarStore = defineStore({
       this.currentCar.isMoving = false
     },
     async setMoveToFalse(userId) {
-      const URL = `http://localhost:3000/car/${userId}`
+      const URL = `${API_URL}/car/${userId}`
 
       await fetch(URL, {
         method: 'PUT',
@@ -203,7 +202,7 @@ export const useCarStore = defineStore({
     },
 
     async setUsers() {
-      const URL = `http://localhost:3000/users/`
+      const URL = `${API_URL}/users/`
 
       const res = await fetch(URL, {
         headers: {
@@ -216,7 +215,7 @@ export const useCarStore = defineStore({
       this.userslist = response.users
     },
     async setCar(userId) {
-      const URL = `http://localhost:3000/user/${userId}`
+      const URL = `${API_URL}/user/${userId}`
 
       const res = await fetch(URL)
       let response = await res.json()
