@@ -15,7 +15,7 @@ const factureSchema = new Schema(
 			default: 0,
 			validate: {
 				validator: function (v) {
-					return v > 0;
+					return v >= 0;
 				},
 				message: (props) => `${props.value} n'est pas un nombre valide`,
 			},

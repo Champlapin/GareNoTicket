@@ -10,7 +10,7 @@ const historiqueSchema = new Schema(
 			required: [true, "prix est requis"],
 			validate: {
 				validator: function (v) {
-					return v > 0;
+					return v >= 0;
 				},
 				message: (props) => `${props.value} n'est pas un nombre valide`,
 			},
