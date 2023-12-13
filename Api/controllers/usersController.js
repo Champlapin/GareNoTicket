@@ -40,7 +40,7 @@ exports.getUsers = async (req, res, next) => {
 		if (!filteredUsers.length) {
 			const error = new Error("Aucun utilisateur trouvé.");
 			error.statusCode = 404;
-			throw error;
+			next(error);
 		}
 
 		return res.status(200).json({
