@@ -14,6 +14,9 @@ const historiqueSchema = new Schema(
 				},
 				message: (props) => `${props.value} n'est pas un nombre valide`,
 			},
+			set: function (v) {
+				return parseFloat(v.toFixed(2));
+			},
 		},
 		isPaid: {
 			type: Boolean,
