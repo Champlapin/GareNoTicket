@@ -3,7 +3,7 @@ import { useToast } from 'vue-toast-notification'
 import { useAuthStore } from '../stores/userStore'
 import { useCarStore } from '../stores/carStore'
 import LowerNav from '../components/LowerNav.vue';
-import { required, email, minLength, maxLength, helpers, not } from '@vuelidate/validators'
+import { required, email, minLength, maxLength, helpers, numeric } from '@vuelidate/validators'
 import InfoIcon from '../components/icons/InfoIcon.vue';
 import { useVuelidate } from '@vuelidate/core';
 import 'vue-toast-notification/dist/theme-sugar.css';
@@ -22,6 +22,7 @@ export default {
             marque: '',
             modele: '',
             couleur: '',
+            price: 0,
         };
     },
     created() {
@@ -33,6 +34,7 @@ export default {
 
         this.username = user.username
         this.Email = user.email
+        this.price = user.price
         if (car) {
             this.plaque = car.plaque
             this.marque = car.marque
@@ -48,7 +50,7 @@ export default {
             if (this.v$.$errors.length <= 0) {
                 if (!this.$carStore.isParked || this.$userStore.user.isValet) {
 
-                    const user = { id: this.$userStore.user.id, username: this.username, email: this.Email }
+                    const user = { id: this.$userStore.user.id, username: this.username, email: this.Email, price: this.price }
                     const voiture = { plaque: this.plaque, marque: this.marque, modele: this.modele, couleur: this.couleur }
 
                     const userRes = await this.$userStore.update(user)
@@ -102,6 +104,10 @@ export default {
                 required: helpers.withMessage('Ce champ est obligatoire', required),
                 minLength: helpers.withMessage('Doit comporter au moins 3 caractères', minLength(3)),
                 maxLength: helpers.withMessage('Doit comporter au plus 50 caractères', maxLength(50))
+            },
+            price: {
+                required: helpers.withMessage('Ce champ est obligatoire', required),
+                numeric: helpers.withMessage('Doit être un chiffre valide', numeric),
             }
         }
     }
@@ -122,7 +128,19 @@ export default {
                     <p class="text-background text-sm mx-auto my-auto">Vous ne pouvez pas modifier votre compte si votre
                         véhicule est stationné.</p>
                 </div>
-                <p class="text-xl my-3 w-10/12 mx-auto font-bold">Compte</p>
+                <div class="flex justify-between w-10/12 mx-auto">
+                    <p class="text-xl my-3 font-bold">Compte</p>
+                    <div v-if="$userStore.isValet" class="my-auto flex justify-end">
+                        <p class="my-auto mx-4 text-lg text-special">Tarif</p>
+                        <div class=" flex justify-end max-w-6/12">
+                            <input type="number" v-model="price" class="input-1">
+                            <div class="text-sm text-error text-opacity-75" v-for="error of v$.price.$errors"
+                                :key="error.uid">
+                                {{ error.$message }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class=" mx-auto w-10/12">
                     <div class="flex flex-col">
                         <label for="username">Nom d'utilisateur</label>
@@ -165,7 +183,8 @@ export default {
                     <div class="flex flex-col">
                         <label for="couleur">Couleur</label>
                         <input @blur="v$.couleur.$touch" id="couleur" class=" input-1 " type="text" v-model="couleur">
-                        <div class="text-sm text-error text-opacity-75" v-for="error of v$.couleur.$errors" :key="error.uid">
+                        <div class="text-sm text-error text-opacity-75" v-for="error of v$.couleur.$errors"
+                            :key="error.uid">
                             {{ error.$message }}
                         </div>
                     </div>

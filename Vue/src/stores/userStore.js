@@ -97,10 +97,7 @@ export const useAuthStore = defineStore({
       console.log('in the update')
       const res = await fetch(updateUser_URL, {
         method: 'PUT',
-        body: JSON.stringify({
-          username: user.username,
-          email: user.email
-        }),
+        body: JSON.stringify(user),
         headers: {
           //TODO : Poser la question.
           'Content-type': 'application/json; charset=UTF-8',
@@ -117,7 +114,8 @@ export const useAuthStore = defineStore({
           email: newUser.email,
           id: newUser.id,
           isValet: newUser.isValet,
-          username: newUser.username
+          username: newUser.username,
+          price : newUser.price
         }
       }
       return res
