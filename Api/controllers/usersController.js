@@ -108,7 +108,7 @@ exports.updateUser = async (req, res, next) => {
 					email: newUser.email,
 					id: newUser.id,
 					isValet: newUser.isValet,
-					price: user.price,
+					price: newUser.price,
 				},
 				voiture: newUser.voiture,
 			},
