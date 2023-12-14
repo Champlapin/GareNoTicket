@@ -109,6 +109,6 @@ exports.signup = async (req, res, next) => {
 			err.statusCode = 500;
 		}
 		console.log(username + " cause problème");
-		next(err);
+		next(err.message);
 	}
 };
