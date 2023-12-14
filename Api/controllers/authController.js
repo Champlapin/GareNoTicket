@@ -62,7 +62,7 @@ exports.login = async (req, res, next) => {
 
 exports.signup = async (req, res, next) => {
 	const { email, username, password, confirmPassword } = req.body;
-	
+
 	try {
 		let existeDeja = await User.findOne({ email });
 
@@ -79,6 +79,9 @@ exports.signup = async (req, res, next) => {
 		}
 
 		let hashed;
+
+		console.log({ email, username, password, confirmPassword });
+
 		hashed = await bcrypt.hash(password, saltRounds).catch((err) => {
 			console.error(err);
 		});
