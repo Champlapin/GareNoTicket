@@ -3,6 +3,7 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const config = require("../config");
+const jwtDecode = require("jwt-decode").jwtDecode;
 const User = require("../models/user");
 const Facture = require("../models/facture");
 const saltRounds = 10;
@@ -67,7 +68,7 @@ exports.login = async (req, res, next) => {
 		if (!err.statusCode) {
 			err.statusCode = 500;
 		}
-
+		
 		next(err);
 	}
 };

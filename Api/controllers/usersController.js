@@ -5,6 +5,7 @@ const Voiture = require("../models/voiture");
 const Histo = require("../models/historique");
 const Facture = require("../models/facture");
 const config = require("../config");
+const jwtDecode = require("jwt-decode").jwtDecode;
 const user = require("../models/user");
 const jwt = require("jsonwebtoken");
 const url_base = config.URL + ":" + config.PORT;
