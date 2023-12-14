@@ -71,25 +71,6 @@ exports.getUser = async (req, res, next) => {
 };
 
 // eslint-disable-next-line no-undef
-exports.getUserBySession = async (req, res, next) => {
-	try {
-		const userId = req.user.id;
-		console.log(userId);
-		const user = await checkUserExists(userId);
-
-		if (!user) {
-			const err = new Error("Aucun utilisateur");
-			err.statusCode = 400;
-			throw err;
-		}
-
-		return res.status(200).json(user);
-	} catch (err) {
-		next(err);
-	}
-};
-
-// eslint-disable-next-line no-undef
 exports.getUserById = async (req, res, next) => {
 	try {
 		const userId = req.params.id;
