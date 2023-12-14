@@ -143,6 +143,7 @@ exports.updateUser = async (req, res, next) => {
 // eslint-disable-next-line no-undef
 exports.updateCar = async (req, res, next) => {
 	try {
+		return res.status(200).json("fuk off");
 		let results;
 		let userId = req.params.userId;
 		const newValues = req.body;
