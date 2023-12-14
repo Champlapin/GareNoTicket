@@ -141,6 +141,60 @@ exports.updateUser = async (req, res, next) => {
 };
 
 // eslint-disable-next-line no-undef
+exports.updateCar = async (req, res, next) => {
+	try {
+		let results;
+		let userId = req.params.userId;
+		const newValues = req.body;
+
+		console.log({ userId, newValues });
+		let user = await User.findById(userId).populate("voiture");
+
+		if (!user) {
+			const err = new Error("Aucun utilisateur");
+			err.statusCode = 400;
+			throw err;
+		}
+		//TODO : Valider les données entrants
+
+		if (user.voiture) {
+			results = await Voiture.findByIdAndUpdate(user.voiture, newValues, {
+				new: true,
+			});
+		} else {
+			results = new Voiture(newValues);
+			await results.save();
+			user.voiture = results;
+			await user.save();
+		}
+		user = await User.findById(userId).populate("voiture");
+		const token = await jwt.sign(
+			{
+				user: {
+					username: user.username,
+					email: user.email,
+					id: user.id,
+					isValet: user.isValet,
+					price: user.price,
+				},
+				voiture: user.voiture,
+			},
+			config.SECRET_JWT,
+			//TODO : changer la date d'expiration.
+			{ expiresIn: "24h" }
+		);
+
+		return res.status(200).json(token);
+	} catch (err) {
+		if (err.name === "ValidationError") {
+			err.statusCode = 400;
+		}
+		if (!err.statusCode) {
+			err.statusCode = 500;
+		}
+		next(err);
+	}
+};
 
 // eslint-disable-next-line no-undef
 exports.deleteUser = async (req, res, next) => {
