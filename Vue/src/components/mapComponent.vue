@@ -32,8 +32,19 @@ export default {
     async mounted() {
         let carStore = this.$carStore
         this.map = L.map('map');
+        let View;
 
-        let View = {
+        //Bizarement asynchrone alors je l'ai désactivé.
+        // if (navigator.geolocation) {
+        //    navigator.geolocation.getCurrentPosition(position => {
+        //        console.log("Latitude: " + position.coords.latitude);
+        //         console.log("Longitude: " + position.coords.longitude);
+        //         View.position = [position.coords.latitude, position.coords.longitude]
+        //         View.zoom = 15
+        //     });
+        // }
+
+        View = {
             position: [46.7922, -71.2639],
             zoom: 15
             //Default map position set to the school.

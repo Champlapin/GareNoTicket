@@ -98,9 +98,9 @@ exports.getUserById = async (req, res, next) => {
 exports.updateUser = async (req, res, next) => {
 	try {
 		let userId = req.params.userId;
-		let { username, email, price } = req.body;
-		price = !price ? 0 : price;
-		const newValues = { username, email, price };
+		const newValues = req.body;
+		newValues.price = !newValues.price ? 0 : newValues.price;
+		let noHash = newValues.noHash ? true : false;
 
 		let newUser = await User.findByIdAndUpdate(userId, newValues, {
 			new: true,
@@ -127,8 +127,11 @@ exports.updateUser = async (req, res, next) => {
 			//TODO : changer la date d'expiration.
 			{ expiresIn: "24h" }
 		);
-
-		return res.status(200).json(token);
+		if (newValues.noHash) {
+			return res.status(200).json(newUser);
+		} else {
+			return res.status(200).json(token);
+		}
 	} catch (err) {
 		if (err.name === "ValidationError") {
 			err.statusCode = 400;
@@ -146,7 +149,7 @@ exports.updateCar = async (req, res, next) => {
 		let results;
 		let userId = req.params.userId;
 		const newValues = req.body;
-
+		let noHash = newValues.noHash ? true : false;
 		let user = await User.findById(userId).populate("voiture");
 
 		if (!user) {
@@ -183,6 +186,9 @@ exports.updateCar = async (req, res, next) => {
 			{ expiresIn: "24h" }
 		);
 
+		if (noHash) {
+			return res.status(200).json(user);
+		}
 		return res.status(200).json(token);
 	} catch (err) {
 		if (err.name === "ValidationError") {

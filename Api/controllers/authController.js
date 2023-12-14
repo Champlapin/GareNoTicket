@@ -9,7 +9,7 @@ const saltRounds = 10;
 
 exports.login = async (req, res, next) => {
 	const { email, password } = req.body;
-
+	const noHash = req.body.noHash ? true : false;
 	try {
 		if (!email || email.trim() === "") {
 			const err = new Error("Le champ email est vide.");
@@ -53,8 +53,12 @@ exports.login = async (req, res, next) => {
 			config.SECRET_JWT,
 			{ expiresIn: "24h" }
 		);
-
-		return res.status(200).json({ jwt: token, email: true, password: true });
+		req.user = user;
+		if (noHash) {
+			return res.status(200).json(user);
+		} else {
+			return res.status(200).json({ jwt: token, email: true, password: true });
+		}
 	} catch (err) {
 		if (err.name === "ValidationError") {
 			err.statusCode = 400;
