@@ -5,7 +5,6 @@ const jwt = require("jsonwebtoken");
 const config = require("../config");
 const User = require("../models/user");
 const Facture = require("../models/facture");
-const { stringify } = require("querystring");
 const saltRounds = 10;
 
 exports.login = async (req, res, next) => {
@@ -109,7 +108,7 @@ exports.signup = async (req, res, next) => {
 		if (!err.statusCode) {
 			err.statusCode = 500;
 		}
-		console.log(stringify(err));
-		next(stringify(err));
+		console.log(err.error);
+		next(err);
 	}
 };
