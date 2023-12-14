@@ -68,7 +68,7 @@ export const useAuthStore = defineStore({
     },
     async signup(email, username, password, confirmPassword) {
       const signup_URL = `${API_URL}/auth/signup`
-
+      let status = 0
       const res = await fetch(signup_URL, {
         method: 'POST',
         body: JSON.stringify({
@@ -81,13 +81,15 @@ export const useAuthStore = defineStore({
           'Content-type': 'application/json; charset=UTF-8'
         }
       }).then((results) => {
+        status = results.status
         return results.json()
       })
-
-      if (res.emailUnique) {
-        return { emailUnique: res.emailUnique }
-      } else if (res.passwordMatch) {
-        return { passwordMatch: res.passwordMatch }
+      if (status == 201) {
+        if (res.emailUnique) {
+          return { emailUnique: res.emailUnique }
+        } else if (res.passwordMatch) {
+          return { passwordMatch: res.passwordMatch }
+        }
       } else {
         return { valide: true }
       }
@@ -115,7 +117,7 @@ export const useAuthStore = defineStore({
           id: newUser.id,
           isValet: newUser.isValet,
           username: newUser.username,
-          price : newUser.price
+          price: newUser.price
         }
       }
       return res

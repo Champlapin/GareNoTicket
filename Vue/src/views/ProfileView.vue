@@ -106,8 +106,8 @@ export default {
                 maxLength: helpers.withMessage('Doit comporter au plus 50 caractères', maxLength(50))
             },
             price: {
-                required: helpers.withMessage('Ce champ est obligatoire', required),
-                numeric: helpers.withMessage('Doit être un chiffre valide', numeric),
+                required: helpers.withMessage('Tarif invalide', required),
+                numeric: helpers.withMessage('Tarif invalide', numeric),
             }
         }
     }
@@ -132,9 +132,9 @@ export default {
                     <p class="text-xl my-3 font-bold">Compte</p>
                     <div v-if="$userStore.isValet" class="my-auto flex justify-end">
                         <p class="my-auto mx-4 text-lg text-special">Tarif</p>
-                        <div class=" flex justify-end max-w-6/12">
+                        <div class="">
                             <input type="number" v-model="price" class="input-1">
-                            <div class="text-sm text-error text-opacity-75" v-for="error of v$.price.$errors"
+                            <div class="text-sm text-error text-opacity-75 absolute" v-for="error of v$.price.$errors"
                                 :key="error.uid">
                                 {{ error.$message }}
                             </div>

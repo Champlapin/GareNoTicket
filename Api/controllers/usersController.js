@@ -41,7 +41,7 @@ exports.getUsers = async (req, res, next) => {
 			const error = new Error("Aucun utilisateur trouvé.");
 			error.statusCode = 404;
 			error.message = "Aucun utilisateur trouvé.";
-			return res.status(404).json({ filteredUsers });
+			throw error;
 		}
 
 		return res.status(200).json({
@@ -57,6 +57,13 @@ exports.getUser = async (req, res, next) => {
 	try {
 		const userId = req.user.userId;
 		const user = await checkUserExists(userId);
+
+		if (!user) {
+			const err = new Error("Aucun utilisateur");
+			err.statusCode = 400;
+			throw err;
+		}
+
 		return res.status(200).json(user);
 	} catch (err) {
 		next(err);
@@ -69,7 +76,14 @@ exports.getUserBySession = async (req, res, next) => {
 		const userId = req.user.id;
 		console.log(userId);
 		const user = await checkUserExists(userId);
-		return status(200).json(user);
+
+		if (!user) {
+			const err = new Error("Aucun utilisateur");
+			err.statusCode = 400;
+			throw err;
+		}
+
+		return res.status(200).json(user);
 	} catch (err) {
 		next(err);
 	}
@@ -80,6 +94,13 @@ exports.getUserById = async (req, res, next) => {
 	try {
 		const userId = req.params.id;
 		const user = await checkUserExists(userId);
+
+		if (!user) {
+			const err = new Error("Aucun utilisateur");
+			err.statusCode = 400;
+			throw err;
+		}
+
 		return res.status(200).json(user);
 	} catch (err) {
 		next(err);
@@ -90,15 +111,17 @@ exports.getUserById = async (req, res, next) => {
 exports.updateUser = async (req, res, next) => {
 	try {
 		let userId = req.params.userId;
-		const { username, email,price } = req.body;
-		const newValues = { username, email,price };
+		const { username, email, price } = req.body;
+		const newValues = { username, email, price };
 
 		let newUser = await User.findByIdAndUpdate(userId, newValues, {
 			new: true,
 		}).populate("voiture");
 
 		if (!newUser) {
-			return res.status(400).json({ message: "l'utilisateur n'existe pas" });
+			const err = new Error("Aucun utilisateur");
+			err.statusCode = 400;
+			throw err;
 		}
 
 		const token = await jwt.sign(
@@ -114,7 +137,7 @@ exports.updateUser = async (req, res, next) => {
 			},
 			config.SECRET_JWT,
 			//TODO : changer la date d'expiration.
-			{ expiresIn: "4h" }
+			{ expiresIn: "24h" }
 		);
 
 		return res.status(200).json(token);
@@ -133,7 +156,9 @@ exports.updateCar = async (req, res, next) => {
 		let user = await User.findById(userId).populate("voiture");
 
 		if (!user) {
-			return res.status(400).json({ message: "l'utilisateur n'existe pas." });
+			const err = new Error("Aucun utilisateur");
+			err.statusCode = 400;
+			throw err;
 		}
 		//TODO : Valider les données entrants
 
@@ -155,13 +180,13 @@ exports.updateCar = async (req, res, next) => {
 					email: user.email,
 					id: user.id,
 					isValet: user.isValet,
-					price: user.price
+					price: user.price,
 				},
 				voiture: user.voiture,
 			},
 			config.SECRET_JWT,
 			//TODO : changer la date d'expiration.
-			{ expiresIn: "4h" }
+			{ expiresIn: "24h" }
 		);
 
 		return res.status(200).json(token);
