@@ -56,6 +56,12 @@ exports.login = async (req, res, next) => {
 			return res.status(200).json({ jwt: token, email: true, password: true });
 		}
 	} catch (err) {
+		if (err.name === "ValidationError") {
+			err.statusCode = 400;
+		}
+		if (!err.statusCode) {
+			err.statusCode = 500;
+		}
 		next(err);
 	}
 };
@@ -96,6 +102,12 @@ exports.signup = async (req, res, next) => {
 
 		return res.status(201).json(user);
 	} catch (err) {
+		if (err.name === "ValidationError") {
+			err.statusCode = 400;
+		}
+		if (!err.statusCode) {
+			err.statusCode = 500;
+		}
 		console.log(username + " cause problème");
 		next(err);
 	}
