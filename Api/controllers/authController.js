@@ -98,6 +98,14 @@ exports.signup = async (req, res, next) => {
 
 		return res.status(201).json(user);
 	} catch (err) {
+		if (err.name === "ValidationError") {
+			err.statusCode = 400;
+		}
+
+		if (!err.statusCode) {
+			err.statusCode = 500;
+		}
+
 		if (!err.statusCode) {
 			err.statusCode = 500;
 		}
