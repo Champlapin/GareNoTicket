@@ -129,4 +129,3 @@ dist
 /Api/seeds/jsons
 *.json
 Api/.env.example
-~$TP4.docx

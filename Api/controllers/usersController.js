@@ -5,7 +5,6 @@ const Voiture = require("../models/voiture");
 const Histo = require("../models/historique");
 const Facture = require("../models/facture");
 const config = require("../config");
-const jwtDecode = require("jwt-decode").jwtDecode;
 const user = require("../models/user");
 const jwt = require("jsonwebtoken");
 const url_base = config.URL + ":" + config.PORT;
@@ -20,9 +19,9 @@ async function checkUserExists(userId) {
 		.select("email username _id")
 		.populate("voiture");
 	if (!user) {
-		const err = new Error("L'utilisateur n'existe pas.");
-		err.statusCode = 404;
-		throw err;
+		const error = new Error("L'utilisateur n'existe pas.");
+		error.statusCode = 404;
+		throw error;
 	}
 	return user;
 }
@@ -39,10 +38,10 @@ exports.getUsers = async (req, res, next) => {
 
 		const filteredUsers = users.filter((user) => user.voiture != null);
 		if (!filteredUsers.length) {
-			const err = new Error("Aucun utilisateur trouvé.");
-			err.statusCode = 404;
-			err.message = "Aucun utilisateur trouvé.";
-			throw err;
+			const error = new Error("Aucun utilisateur trouvé.");
+			error.statusCode = 404;
+			error.message = "Aucun utilisateur trouvé.";
+			throw error;
 		}
 
 		return res.status(200).json({
@@ -72,6 +71,25 @@ exports.getUser = async (req, res, next) => {
 };
 
 // eslint-disable-next-line no-undef
+exports.getUserBySession = async (req, res, next) => {
+	try {
+		const userId = req.user.id;
+		console.log(userId);
+		const user = await checkUserExists(userId);
+
+		if (!user) {
+			const err = new Error("Aucun utilisateur");
+			err.statusCode = 400;
+			throw err;
+		}
+
+		return res.status(200).json(user);
+	} catch (err) {
+		next(err);
+	}
+};
+
+// eslint-disable-next-line no-undef
 exports.getUserById = async (req, res, next) => {
 	try {
 		const userId = req.params.id;
@@ -85,12 +103,6 @@ exports.getUserById = async (req, res, next) => {
 
 		return res.status(200).json(user);
 	} catch (err) {
-		if (err.name === "ValidationError") {
-			err.statusCode = 400;
-		}
-		if (!err.statusCode) {
-			err.statusCode = 500;
-		}
 		next(err);
 	}
 };
@@ -99,9 +111,8 @@ exports.getUserById = async (req, res, next) => {
 exports.updateUser = async (req, res, next) => {
 	try {
 		let userId = req.params.userId;
-		const newValues = req.body;
-		newValues.price = !newValues.price ? 0 : newValues.price;
-		let noHash = newValues.noHash ? true : false;
+		const { username, email, price } = req.body;
+		const newValues = { username, email, price };
 
 		let newUser = await User.findByIdAndUpdate(userId, newValues, {
 			new: true,
@@ -128,19 +139,10 @@ exports.updateUser = async (req, res, next) => {
 			//TODO : changer la date d'expiration.
 			{ expiresIn: "24h" }
 		);
-		if (newValues.noHash) {
-			return res.status(200).json(newUser);
-		} else {
-			return res.status(200).json(token);
-		}
-	} catch (err) {
-		if (err.name === "ValidationError") {
-			err.statusCode = 400;
-		}
-		if (!err.statusCode) {
-			err.statusCode = 500;
-		}
-		next(err);
+
+		return res.status(200).json(token);
+	} catch (error) {
+		next(error);
 	}
 };
 
@@ -150,12 +152,12 @@ exports.updateCar = async (req, res, next) => {
 		let results;
 		let userId = req.params.userId;
 		const newValues = req.body;
-		let noHash = newValues.noHash ? true : false;
+
 		let user = await User.findById(userId).populate("voiture");
 
 		if (!user) {
 			const err = new Error("Aucun utilisateur");
-			err.statusCode = 500;
+			err.statusCode = 400;
 			throw err;
 		}
 		//TODO : Valider les données entrants
@@ -187,18 +189,9 @@ exports.updateCar = async (req, res, next) => {
 			{ expiresIn: "24h" }
 		);
 
-		if (noHash) {
-			return res.status(200).json(user);
-		}
 		return res.status(200).json(token);
-	} catch (err) {
-		if (err.name === "ValidationError") {
-			err.statusCode = 400;
-		}
-		if (!err.statusCode) {
-			err.statusCode = 500;
-		}
-		next(err);
+	} catch (error) {
+		next(error);
 	}
 };
 

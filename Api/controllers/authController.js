@@ -3,72 +3,59 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const config = require("../config");
-const jwtDecode = require("jwt-decode").jwtDecode;
 const User = require("../models/user");
 const Facture = require("../models/facture");
 const saltRounds = 10;
 
 exports.login = async (req, res, next) => {
 	const { email, password } = req.body;
-	const noHash = req.body.noHash ? true : false;
+
 	try {
-		if (!email || email.trim() === "") {
-			const err = new Error("Le champ email est vide.");
-			err.statusCode = 400;
-			throw err;
-		}
-
-		if (!password || password.trim() === "") {
-			const err = new Error("Le champ password est vide.");
-			err.statusCode = 400;
-			throw err;
-		}
-
-		const user = await User.findOne({ email }).populate("voiture");
-
-		if (!user) {
-			const err = new Error("Aucun utilisateur avec ce email.");
-			err.statusCode = 400;
-			throw err;
-		}
-
-		const valide = await bcrypt.compare(password, user.password);
-
-		if (!valide) {
-			const err = new Error("Mot de passe est invalide");
-			err.statusCode = 400;
-			throw err;
-		}
-
-		const token = await jwt.sign(
-			{
-				user: {
-					username: user.username,
-					email: user.email,
-					id: user.id,
-					isValet: user.isValet,
-					price: user.price,
-				},
-				voiture: user.voiture,
-			},
-			config.SECRET_JWT,
-			{ expiresIn: "24h" }
-		);
-		req.user = user;
-		if (noHash) {
-			return res.status(200).json(user);
+		//TODO : Confirmer avec le prof.
+		//TODO : mettre dans un JWT
+		if (!email || email.trim === "") {
+			res.status(400).json({
+				email: true,
+				message: "Le champ email est vide.",
+			});
+		} else if (!password || password.trim === "") {
+			res.status(400).json({
+				password: true,
+				message: "le champ password est vide.",
+			});
 		} else {
+			let user = await User.findOne({ email }).populate("voiture");
+			if (!user) {
+				return res
+					.status(400)
+					.json({ email: false, message: "Aucun utilisateur avec ce email." });
+			}
+			let valide = await bcrypt.compare(password, user.password);
+			if (!valide) {
+				return res
+					.status(400)
+					.json({ password: false, message: "Mot de passe est invalide" });
+			}
+
+			const token = await jwt.sign(
+				{
+					user: {
+						username: user.username,
+						email: user.email,
+						id: user.id,
+						isValet: user.isValet,
+						price: user.price,
+					},
+					voiture: user.voiture,
+				},
+				config.SECRET_JWT,
+				//TODO : changer la date d'expiration.
+				{ expiresIn: "24h" }
+			);
+
 			return res.status(200).json({ jwt: token, email: true, password: true });
 		}
 	} catch (err) {
-		if (err.name === "ValidationError") {
-			err.statusCode = 400;
-		}
-
-		if (!err.statusCode) {
-			err.statusCode = 500;
-		}
-		
 		next(err);
 	}
 };
@@ -77,21 +64,27 @@ exports.signup = async (req, res, next) => {
 	const { email, username, password, confirmPassword } = req.body;
 
 	try {
-		const existeDeja = await User.findOne({ email });
+		let existeDeja = await User.findOne({ email });
 
 		if (existeDeja) {
-			const err = new Error("utilisateur avec cet email existe deja");
-			err.statusCode = 400;
-			throw err;
+			return res
+				.status(400)
+				.json({ emailUnique: "utilisateur avec cet email existe deja" });
 		}
 
 		if (password !== confirmPassword) {
-			const err = new Error("Le mot de passe ne correspond pas");
-			err.statusCode = 400;
-			throw err;
+			return res
+				.status(400)
+				.json({ passwordMatch: "The passwords do not match" });
 		}
 
-		const hashed = await bcrypt.hash(password, saltRounds);
+		let hashed;
+
+		console.log({ email, username, password, confirmPassword });
+
+		hashed = await bcrypt.hash(password, saltRounds).catch((err) => {
+			next(err);
+		});
 
 		const user = new User({
 			email,
@@ -103,17 +96,7 @@ exports.signup = async (req, res, next) => {
 
 		return res.status(201).json(user);
 	} catch (err) {
-		if (err.name === "ValidationError") {
-			err.statusCode = 400;
-		}
-
-		if (!err.statusCode) {
-			err.statusCode = 500;
-		}
-
-		if (!err.statusCode) {
-			err.statusCode = 500;
-		}
+		console.log(username + " cause problème");
 		next(err);
 	}
 };
