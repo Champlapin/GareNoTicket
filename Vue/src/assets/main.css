@@ -13,10 +13,20 @@
         --color-accent: 19, 73, 221;
         --color-white: 253, 253, 253;
         --color-error: 179, 27, 27;
-        --color-special: 55,181,1;
+        --color-special: 55, 181, 1;
     }
 
     :root[data-theme="dark"] {
+        --color-text: 232, 238, 253;
+        --color-background: 2, 9, 29;
+        --color-primary: 179, 199, 255;
+        --color-secondary: 5, 20, 61;
+        --color-accent: 34, 88, 236;
+        --color-error: 255, 59, 59;
+        --color-special: 0, 200, 0;
+    }
+
+    :root.dark-theme {
         --color-text: 232, 238, 253;
         --color-background: 2, 9, 29;
         --color-primary: 179, 199, 255;
@@ -42,43 +52,54 @@
 
 @layer components {
     .input-1 {
-        @apply rounded-md py-1 my-1 px-2 border border-text  border-opacity-40 outline-none transition-all ring-0 focus:ring-accent focus:ring-1;
+        @apply rounded-md py-1 my-1 px-2 border border-text border-opacity-40 outline-none transition-all ring-0 focus:ring-accent focus:ring-1;
     }
-    .btn-base{
+
+    .btn-base {
         @apply fill-background p-1 bg-primary text-background transition-all flex border-primary shadow-sm shadow-primary border mx-4 rounded-sm
     }
 
-    .btn-active{
+    .btn-active {
         @apply btn-base hover:bg-accent hover:border-accent;
     }
-    .btn-inactive{
+
+    .btn-inactive {
         @apply btn-base opacity-60
     }
+
     .icon {
         @apply fill-primary hover:fill-accent transition-all active:fill-secondary
     }
-    .car-item{
+
+    .car-item {
         @apply text-sm border-text border-b border-opacity-10 py-2 w-full transition-all
     }
-    .selected-car{
+
+    .selected-car {
         @apply shadow-special bg-opacity-20 bg-special
     }
-    .btn-payer{
-        @apply bg-accent p-2 text-background rounded-3xl flex fill-background  transition-all duration-300 
+
+    .btn-payer {
+        @apply bg-accent p-2 text-background rounded-3xl flex fill-background transition-all duration-300
     }
-    .btn-payer-active{
+
+    .btn-payer-active {
         @apply btn-payer active:bg-special active:hover:rounded-lg
     }
-    .btn-payer-inactive{
+
+    .btn-payer-inactive {
         @apply btn-payer bg-opacity-75
     }
-    .base-nav-link{
+
+    .base-nav-link {
         @apply my-auto p-2 mx-2 rounded-lg border-2 transition-all
     }
-    .nav-link{
+
+    .nav-link {
         @apply base-nav-link border-primary text-primary hover:bg-primary hover:text-background active:bg-secondary active:border-secondary
     }
-    .nav-link-2{
+
+    .nav-link-2 {
         @apply base-nav-link border-accent text-background bg-accent hover:brightness-90 active:bg-secondary active:border-secondary
     }
 }

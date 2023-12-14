@@ -20,12 +20,13 @@ export default {
 </script>
 
 <template>
-  <header>
-    <navigationBar />
-  </header>
-  <main class=" min-h-[80vh] my-8">
-    <RouterView />
-  </main>
-
-  <FooterComponent />
+  <div class="dark-theme">
+    <header>
+      <navigationBar />
+    </header>
+    <main class=" min-h-[80vh] my-8">
+      <RouterView />
+    </main>
+    <FooterComponent />
+  </div>
 </template>
