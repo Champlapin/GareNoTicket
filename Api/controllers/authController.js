@@ -83,7 +83,7 @@ exports.signup = async (req, res, next) => {
 		console.log({ email, username, password, confirmPassword });
 
 		hashed = await bcrypt.hash(password, saltRounds).catch((err) => {
-			console.error(err);
+			next(err);
 		});
 
 		const user = new User({
