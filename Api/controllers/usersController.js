@@ -19,9 +19,9 @@ async function checkUserExists(userId) {
 		.select("email username _id")
 		.populate("voiture");
 	if (!user) {
-		const error = new Error("L'utilisateur n'existe pas.");
-		error.statusCode = 404;
-		throw error;
+		const err = new Error("L'utilisateur n'existe pas.");
+		err.statusCode = 404;
+		throw err;
 	}
 	return user;
 }
@@ -38,10 +38,10 @@ exports.getUsers = async (req, res, next) => {
 
 		const filteredUsers = users.filter((user) => user.voiture != null);
 		if (!filteredUsers.length) {
-			const error = new Error("Aucun utilisateur trouvé.");
-			error.statusCode = 404;
-			error.message = "Aucun utilisateur trouvé.";
-			throw error;
+			const err = new Error("Aucun utilisateur trouvé.");
+			err.statusCode = 404;
+			err.message = "Aucun utilisateur trouvé.";
+			throw err;
 		}
 
 		return res.status(200).json({
@@ -103,6 +103,12 @@ exports.getUserById = async (req, res, next) => {
 
 		return res.status(200).json(user);
 	} catch (err) {
+		if (err.name === "ValidationError") {
+			err.statusCode = 400;
+		}
+		if (!err.statusCode) {
+			err.statusCode = 500;
+		}
 		next(err);
 	}
 };
@@ -141,8 +147,14 @@ exports.updateUser = async (req, res, next) => {
 		);
 
 		return res.status(200).json(token);
-	} catch (error) {
-		next(error);
+	} catch (err) {
+		if (err.name === "ValidationError") {
+			err.statusCode = 400;
+		}
+		if (!err.statusCode) {
+			err.statusCode = 500;
+		}
+		next(err);
 	}
 };
 
@@ -190,8 +202,14 @@ exports.updateCar = async (req, res, next) => {
 		);
 
 		return res.status(200).json(token);
-	} catch (error) {
-		next(error);
+	} catch (err) {
+		if (err.name === "ValidationError") {
+			err.statusCode = 400;
+		}
+		if (!err.statusCode) {
+			err.statusCode = 500;
+		}
+		next(err);
 	}
 };
 
