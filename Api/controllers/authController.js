@@ -78,9 +78,8 @@ exports.signup = async (req, res, next) => {
 				.json({ passwordMatch: "The passwords do not match" });
 		}
 
-		//TODO : Hasher le mot de passe.
 		let hashed;
-		hashed = await bcrypt.hash(password, saltRounds).catch((err) => {
+		hashed = await bcrypt.hash(password, process.env.SALT_ROUNDS).catch((err) => {
 			console.error(err);
 		});
 
@@ -89,7 +88,7 @@ exports.signup = async (req, res, next) => {
 			username,
 			password: hashed,
 		});
-		console.log(user);
+
 		await user.save();
 
 		return res.status(201).json(user);
