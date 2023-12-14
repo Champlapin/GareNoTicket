@@ -147,6 +147,7 @@ exports.updateCar = async (req, res, next) => {
 		let userId = req.params.userId;
 		const newValues = req.body;
 
+		console.log({ userId, newValues });
 		let user = await User.findById(userId).populate("voiture");
 
 		if (!user) {
