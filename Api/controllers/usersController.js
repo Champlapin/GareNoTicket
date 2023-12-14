@@ -141,9 +141,6 @@ exports.updateUser = async (req, res, next) => {
 };
 
 // eslint-disable-next-line no-undef
-exports.updateCar = async (req, res, next) => {
-	return res.status(200).json("OK FUK OFF");
-};
 
 // eslint-disable-next-line no-undef
 exports.deleteUser = async (req, res, next) => {
