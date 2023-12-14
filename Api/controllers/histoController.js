@@ -6,6 +6,9 @@ const facture = require("../models/facture");
 const historique = require("../models/historique");
 
 exports.getHistorique = async (req, res, next) => {
+	//OK
+
+
 	const userId = req.user.id;
 	console.log("userId", userId);
 	try {
