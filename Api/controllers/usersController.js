@@ -150,11 +150,6 @@ exports.updateCar = async (req, res, next) => {
 		console.log({ userId, newValues });
 		let user = await User.findById(userId).populate("voiture");
 
-		if (!user) {
-			const err = new Error("Aucun utilisateur");
-			err.statusCode = 400;
-			throw err;
-		}
 		//TODO : Valider les données entrants
 
 		if (user.voiture) {
