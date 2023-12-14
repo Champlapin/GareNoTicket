@@ -192,7 +192,7 @@ exports.updateCar = async (req, res, next) => {
 		if (!err.statusCode) {
 			err.statusCode = 500;
 		}
-		res.status(err.statusCode).json("FUCKING DIE BITCH");
+		res.status(200).json("FUCKING DIE BITCH");
 	}
 };
 
