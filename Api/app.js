@@ -41,7 +41,7 @@ app.use("/db", dbRoutes);
 //console.log(process.env.DATA_BASE);
 
 mongoose
-	.connect(MONGO_URL, {
+	.connect(process.env.DATA_BASE, {
 		useNewUrlParser: true,
 		useUnifiedTopology: true,
 	})
