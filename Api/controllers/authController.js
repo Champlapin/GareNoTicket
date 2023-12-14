@@ -79,7 +79,7 @@ exports.signup = async (req, res, next) => {
 		}
 
 		let hashed;
-		hashed = await bcrypt.hash(password, process.env.SALT_ROUNDS).catch((err) => {
+		hashed = await bcrypt.hash(password, 10).catch((err) => {
 			console.error(err);
 		});
 
