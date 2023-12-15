@@ -200,6 +200,7 @@ exports.deleteUser = async (req, res, next) => {
 	try {
 		const userId = req.user.id;
 		console.log(req.user);
+		return res.status(404).json(req.user);
 		const user = await checkUserExists(userId);
 		await User.findByIdAndRemove(userId);
 		if (user.voiture) {
