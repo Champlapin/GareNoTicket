@@ -198,7 +198,8 @@ exports.updateCar = async (req, res, next) => {
 // eslint-disable-next-line no-undef
 exports.deleteUser = async (req, res, next) => {
 	try {
-		const userId = req.user._id;
+		const userId = req.user.id;
+		console.log(req.user);
 		const user = await checkUserExists(userId);
 		await User.findByIdAndRemove(userId);
 		if (user.voiture) {
